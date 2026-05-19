@@ -252,7 +252,7 @@
 
   // === NOTES ===
   var API_KEY = '$2a$10$ejCROplsY2SI8jptqg3/..lzQ2e1sdo03oYh669CtXyinoBWeNYBm';
-  var BIN_ID = null;
+  var BIN_ID = '6a0c2d386610dd3ae86c53ca';
   var notesData = { 'kef-beaches':[], 'kef-food':[], 'kef-visit':[], 'ith-beaches':[], 'ith-food':[], 'ith-visit':[] };
   var userName = localStorage.getItem('tripUserName') || '';
 
@@ -294,37 +294,10 @@
     return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
 
-  // Load or create bin
+  // Load data with fixed bin ID
   function loadData() {
-    var savedBinId = localStorage.getItem('tripBinId');
-    if (savedBinId) {
-      BIN_ID = savedBinId;
-      fetchData();
-    } else {
-      createBin();
-    }
-  }
-
-  function createBin() {
-    setStatus('Δημιουργία cloud αποθηκευτικού χώρου...');
-    fetch('https://api.jsonbin.io/v3/b', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Master-Key': API_KEY,
-        'X-Bin-Name': 'trip-kefalonia-ithaki-2026',
-        'X-Bin-Private': 'false'
-      },
-      body: JSON.stringify(notesData)
-    })
-    .then(function(r){ return r.json(); })
-    .then(function(data) {
-      BIN_ID = data.metadata.id;
-      localStorage.setItem('tripBinId', BIN_ID);
-      setStatus('&#10003; Συνδέθηκε! Ανανέωση κάθε 30 δευτ.');
-      renderNotes();
-    })
-    .catch(function(){ setStatus('&#10005; Σφάλμα σύνδεσης. Δοκίμασε ξανά.'); });
+    setStatus('Σύνδεση...');
+    fetchData();
   }
 
   function fetchData() {
