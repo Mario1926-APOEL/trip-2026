@@ -502,13 +502,15 @@ body.dark-mode .badge-ok{background:#12382d;color:#7ee6c4}
   <div class="upload-area" id="uploadArea">
     <div class="upload-icon">&#128247;</div>
     <div class="upload-text">Πρόσθεσε φωτογραφία ή video από το ταξίδι</div>
-    <div class="upload-sub">Επίλεξε από gallery ή χρησιμοποίησε την κάμερα</div>
+    <div class="upload-sub">Επίλεξε από gallery ή βγάλε απευθείας με την κάμερα</div>
     <div class="upload-actions">
       <button class="upload-btn" id="uploadTriggerBtn" type="button">&#128247; Επιλογή photo/video</button>
-      <button class="upload-btn secondary" id="cameraTriggerBtn" type="button">&#128248; Άνοιγμα κάμερας</button>
+      <button class="upload-btn secondary" id="photoCameraTriggerBtn" type="button">&#128248; Βγάλε φωτογραφία</button>
+      <button class="upload-btn secondary" id="videoCameraTriggerBtn" type="button">&#127909; Βγάλε video</button>
     </div>
     <input type="file" id="photoFileInput" class="upload-input" accept="image/*,video/*" multiple/>
-    <input type="file" id="cameraFileInput" class="upload-input" accept="image/*,video/*" capture="environment"/>
+    <input type="file" id="photoCameraFileInput" class="upload-input" accept="image/*" capture="environment"/>
+    <input type="file" id="videoCameraFileInput" class="upload-input" accept="video/*" capture="environment"/>
   </div>
 
   <div class="upload-status" id="photoUploadStatus"></div>
@@ -1087,9 +1089,14 @@ document.getElementById("uploadTriggerBtn").addEventListener("click", function(e
   document.getElementById("photoFileInput").click();
 });
 
-document.getElementById("cameraTriggerBtn").addEventListener("click", function(e) {
+document.getElementById("photoCameraTriggerBtn").addEventListener("click", function(e) {
   e.stopPropagation();
-  document.getElementById("cameraFileInput").click();
+  document.getElementById("photoCameraFileInput").click();
+});
+
+document.getElementById("videoCameraTriggerBtn").addEventListener("click", function(e) {
+  e.stopPropagation();
+  document.getElementById("videoCameraFileInput").click();
 });
 
 document.getElementById("uploadArea").addEventListener("click", function(e) {
@@ -1118,10 +1125,11 @@ async function handlePhotoFiles(e) {
     formData.append("context", "author=" + photoUserName);
 
     try {
-      var cloudinaryResponse = await fetch(CLOUDINARY_UPLOAD_URL, { method: "POST", body: formData });
+      var uploadUrl = "https://api.cloudinary.com/v1_1/" + CLOUDINARY_CLOUD_NAME + "/" + (isVideo ? "video" : "image") + "/upload";
+      var cloudinaryResponse = await fetch(uploadUrl, { method: "POST", body: formData });
       var cloudinaryData = await cloudinaryResponse.json();
       if (!cloudinaryResponse.ok || !cloudinaryData.secure_url) {
-        throw new Error(cloudinaryData.error && cloudinaryData.error.message ? cloudinaryData.error.message : "Cloudinary upload failed");
+        throw new Error(cloudinaryData.error && cloudinaryData.error.message ? cloudinaryData.error.message : (isVideo ? "Cloudinary video upload failed. Check that your unsigned upload preset allows videos." : "Cloudinary upload failed"));
       }
 
       var photo = {
@@ -1151,7 +1159,8 @@ async function handlePhotoFiles(e) {
 }
 
 document.getElementById("photoFileInput").addEventListener("change", handlePhotoFiles);
-document.getElementById("cameraFileInput").addEventListener("change", handlePhotoFiles);
+document.getElementById("photoCameraFileInput").addEventListener("change", handlePhotoFiles);
+document.getElementById("videoCameraFileInput").addEventListener("change", handlePhotoFiles);
 
 loadSharedPhotos();
 setInterval(loadSharedPhotos, 30000);
