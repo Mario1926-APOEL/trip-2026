@@ -342,7 +342,7 @@ function showWaToast(author, cat, text) {
   var toast = document.getElementById("waToast");
   toast.classList.add("show");
   if (waToastTimeout) clearTimeout(waToastTimeout);
-  waToastTimeout = setTimeout(function(){ toast.classList.remove("show"); }, 8000);
+  waToastTimeout = setTimeout(function(){ toast.classList.remove("show"); }, 4000);
 }
 document.getElementById("waToastClose").addEventListener("click", function() {
   document.getElementById("waToast").classList.remove("show");
