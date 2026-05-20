@@ -1138,12 +1138,33 @@ async function handlePhotoFiles(e) {
     formData.append("context", "author=" + photoUserName);
 
     try {
-      // Use /auto/upload so the same unsigned preset can accept both images and videos.
-      var uploadUrl = "https://api.cloudinary.com/v1_1/" + CLOUDINARY_CLOUD_NAME + "/auto/upload";
+      // Important fix: Cloudinary video uploads must use the video endpoint.
+      // Images use /image/upload, videos use /video/upload.
+      var resourceType = isVideo ? "video" : "image";
+      var uploadUrl = "https://api.cloudinary.com/v1_1/" + CLOUDINARY_CLOUD_NAME + "/" + resourceType + "/upload";
+
       var cloudinaryResponse = await fetch(uploadUrl, { method: "POST", body: formData });
-      var cloudinaryData = await cloudinaryResponse.json();
+      var cloudinaryData = null;
+      try { cloudinaryData = await cloudinaryResponse.json(); } catch(parseErr) { cloudinaryData = {}; }
+
+      // Fallback for accounts/presets that accept auto uploads better than explicit endpoints.
+      if ((!cloudinaryResponse.ok || !cloudinaryData.secure_url) && isVideo) {
+        var firstError = cloudinaryData && cloudinaryData.error && cloudinaryData.error.message ? cloudinaryData.error.message : "";
+        var autoUrl = "https://api.cloudinary.com/v1_1/" + CLOUDINARY_CLOUD_NAME + "/auto/upload";
+        var autoResponse = await fetch(autoUrl, { method: "POST", body: formData });
+        var autoData = null;
+        try { autoData = await autoResponse.json(); } catch(parseErr2) { autoData = {}; }
+        if (autoResponse.ok && autoData.secure_url) {
+          cloudinaryResponse = autoResponse;
+          cloudinaryData = autoData;
+        } else {
+          var secondError = autoData && autoData.error && autoData.error.message ? autoData.error.message : "";
+          throw new Error(secondError || firstError || "Video upload failed. Check that your Cloudinary unsigned upload preset allows video files.");
+        }
+      }
+
       if (!cloudinaryResponse.ok || !cloudinaryData.secure_url) {
-        throw new Error(cloudinaryData.error && cloudinaryData.error.message ? cloudinaryData.error.message : "Cloudinary upload failed. Check that your upload preset allows images and videos.");
+        throw new Error(cloudinaryData.error && cloudinaryData.error.message ? cloudinaryData.error.message : "Cloudinary upload failed.");
       }
 
       var photo = {
@@ -1151,7 +1172,7 @@ async function handlePhotoFiles(e) {
         author: photoUserName,
         publicId: cloudinaryData.public_id || "",
         uploadedAt: new Date().toISOString(),
-        mediaType: cloudinaryData.resource_type || (isVideo ? "video" : "image")
+        mediaType: resourceType
       };
 
       var savedRows = await savePhotoRecordToSupabase(photo);
@@ -1161,7 +1182,7 @@ async function handlePhotoFiles(e) {
       setPhotoUploadStatus("&#10003; Uploaded <strong>" + uploadedCount + "/" + files.length + "</strong>. Τώρα το βλέπουν όλοι.", true);
     } catch (err) {
       console.error(err);
-      setPhotoUploadStatus("Upload error: " + (err.message || err), true);
+      setPhotoUploadStatus("Upload error: " + (err.message || err) + "<br><small>Για video: έλεγξε ότι το Cloudinary upload preset είναι unsigned και επιτρέπει video formats/mp4,mov.</small>", true);
     }
   }
 
