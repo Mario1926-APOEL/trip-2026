@@ -134,6 +134,8 @@ footer{text-align:center;font-size:12px;color:#7a7870;margin-top:2.5rem}
   <button class="tab-btn" data-tab="claude">&#10024; Ιδέες Claude</button>
   <button class="tab-btn" data-tab="program">&#128336; Πρόγραμμα</button>
   <button class="tab-btn" data-tab="maps">&#128205; Maps</button>
+</div>
+<div class="tab-bar" id="tabBar2">
   <button class="tab-btn" data-tab="gallery">&#127956; Gallery</button>
   <button class="tab-btn" data-tab="photos">&#128247; Φωτογραφίες</button>
 </div>
@@ -266,61 +268,87 @@ footer{text-align:center;font-size:12px;color:#7a7870;margin-top:2.5rem}
 <a class="map-card" href="https://maps.google.com/?q=Homer+School+Ithaca+Greece+Exogi" target="_blank"><div class="map-icon map-visit">&#128205;</div><div class="map-body"><div class="map-name">Homer's School</div><div class="map-cat">Ανάκτορο Οδυσσέα &bull; Εξωγή</div></div><div class="map-arrow">&#8599;</div></a>
 </div>
 <div class="tab-pane" id="tab-gallery">
-<p style="font-size:13px;color:#7a7870;text-align:center;margin-top:12px;margin-bottom:4px;">Κάνε tap για να δεις φωτογραφίες &#128247;</p>
+<p style="font-size:13px;color:#7a7870;text-align:center;margin-top:12px;margin-bottom:4px;">Tap για φωτογραφίες Google &#128247;</p>
 
 <p class="gallery-section-title">&#127958; Κεφαλονιά &mdash; Παραλίες</p>
 <div class="gallery-grid">
-  <div class="gallery-card" onclick="openGallery('Φτερή','https://www.google.com/search?q=Fteri+beach+Kefalonia&tbm=isch')">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Fteri_beach_Kefalonia.jpg/640px-Fteri_beach_Kefalonia.jpg" onerror="this.parentNode.querySelector('.gallery-loading').style.display='flex';this.style.display='none'" loading="lazy"/>
-    <div class="gallery-loading" style="display:none">&#127958;<br>Φτερή</div>
+  <div class="gallery-card" onclick="window.open('https://www.google.com/search?q=Fteri+beach+Kefalonia&tbm=isch','_blank')">
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:6px;">
+      <span style="font-size:28px;">&#127958;</span>
+      <span style="font-size:12px;color:#7a7870;">Φτερή</span>
+    </div>
     <span class="gallery-card-badge">Hari</span>
     <div class="gallery-card-label">Φτερή</div>
   </div>
-  <div class="gallery-card" onclick="openGallery('Μύρτος','https://www.google.com/search?q=Myrtos+beach+Kefalonia&tbm=isch')">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Myrtos_beach_Kefalonia_2010.jpg/640px-Myrtos_beach_Kefalonia_2010.jpg" onerror="this.parentNode.querySelector('.gallery-loading').style.display='flex';this.style.display='none'" loading="lazy"/>
-    <div class="gallery-loading" style="display:none">&#127958;<br>Μύρτος</div>
+  <div class="gallery-card" onclick="window.open('https://www.google.com/search?q=Myrtos+beach+Kefalonia&tbm=isch','_blank')">
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:6px;">
+      <span style="font-size:28px;">&#127958;</span>
+      <span style="font-size:12px;color:#7a7870;">Μύρτος</span>
+    </div>
     <span class="gallery-card-badge">Hari</span>
     <div class="gallery-card-label">Μύρτος</div>
   </div>
-  <div class="gallery-card" onclick="openGallery('Φωκί','https://www.google.com/search?q=Foki+beach+Kefalonia&tbm=isch')">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Fiskardo_Kefalonia_Greece.jpg/640px-Fiskardo_Kefalonia_Greece.jpg" onerror="this.parentNode.querySelector('.gallery-loading').style.display='flex';this.style.display='none'" loading="lazy"/>
-    <div class="gallery-loading" style="display:none">&#127958;<br>Φωκί</div>
+  <div class="gallery-card" onclick="window.open('https://www.google.com/search?q=Foki+beach+Kefalonia&tbm=isch','_blank')">
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:6px;">
+      <span style="font-size:28px;">&#127958;</span>
+      <span style="font-size:12px;color:#7a7870;">Φωκί</span>
+    </div>
     <span class="gallery-card-badge">Hari</span>
     <div class="gallery-card-label">Φωκί</div>
   </div>
-  <div class="gallery-card" onclick="openGallery('Βουτή','https://www.google.com/search?q=Vouti+beach+Kefalonia&tbm=isch')">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Antisamos_beach.jpg/640px-Antisamos_beach.jpg" onerror="this.parentNode.querySelector('.gallery-loading').style.display='flex';this.style.display='none'" loading="lazy"/>
-    <div class="gallery-loading" style="display:none">&#127958;<br>Βουτή</div>
+  <div class="gallery-card" onclick="window.open('https://www.google.com/search?q=Vouti+beach+Kefalonia&tbm=isch','_blank')">
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:6px;">
+      <span style="font-size:28px;">&#127958;</span>
+      <span style="font-size:12px;color:#7a7870;">Βουτή</span>
+    </div>
     <span class="gallery-card-badge">Hari</span>
     <div class="gallery-card-label">Βουτή</div>
   </div>
-  <div class="gallery-card" onclick="openGallery('Κιμηλιά','https://www.google.com/search?q=Kimilia+beach+Kefalonia&tbm=isch')">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Xi_beach_Kefalonia.jpg/640px-Xi_beach_Kefalonia.jpg" onerror="this.parentNode.querySelector('.gallery-loading').style.display='flex';this.style.display='none'" loading="lazy"/>
-    <div class="gallery-loading" style="display:none">&#127958;<br>Κιμηλιά</div>
+  <div class="gallery-card" onclick="window.open('https://www.google.com/search?q=Kimilia+beach+Kefalonia&tbm=isch','_blank')">
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:6px;">
+      <span style="font-size:28px;">&#127958;</span>
+      <span style="font-size:12px;color:#7a7870;">Κιμηλιά</span>
+    </div>
     <span class="gallery-card-badge">Hari</span>
     <div class="gallery-card-label">Κιμηλιά</div>
   </div>
-  <div class="gallery-card" onclick="openGallery('Ξι','https://www.google.com/search?q=Xi+beach+Kefalonia&tbm=isch')">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Xi_beach_Kefalonia.jpg/640px-Xi_beach_Kefalonia.jpg" onerror="this.parentNode.querySelector('.gallery-loading').style.display='flex';this.style.display='none'" loading="lazy"/>
-    <div class="gallery-loading" style="display:none">&#127958;<br>Ξι</div>
+  <div class="gallery-card" onclick="window.open('https://www.google.com/search?q=White+Rocks+beach+Kefalonia+boat&tbm=isch','_blank')">
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:6px;">
+      <span style="font-size:28px;">&#127958;</span>
+      <span style="font-size:12px;color:#7a7870;">White Rocks</span>
+    </div>
     <span class="gallery-card-badge">Hari</span>
-    <div class="gallery-card-label">Ξι (Xi Beach)</div>
+    <div class="gallery-card-label">White Rocks</div>
   </div>
-  <div class="gallery-card" onclick="openGallery('Δαφνούδι','https://www.google.com/search?q=Dafnoudi+beach+Kefalonia&tbm=isch')">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Myrtos_beach_Kefalonia_2010.jpg/640px-Myrtos_beach_Kefalonia_2010.jpg" onerror="this.parentNode.querySelector('.gallery-loading').style.display='flex';this.style.display='none'" loading="lazy"/>
-    <div class="gallery-loading" style="display:none">&#127958;<br>Δαφνούδι</div>
+  <div class="gallery-card" onclick="window.open('https://www.google.com/search?q=Dafnoudi+beach+Kefalonia&tbm=isch','_blank')">
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:6px;">
+      <span style="font-size:28px;">&#127958;</span>
+      <span style="font-size:12px;color:#7a7870;">Δαφνούδι</span>
+    </div>
     <span class="gallery-card-badge">Hari</span>
     <div class="gallery-card-label">Δαφνούδι</div>
   </div>
-  <div class="gallery-card" onclick="openGallery('Antisamos','https://www.google.com/search?q=Antisamos+beach+Kefalonia&tbm=isch')">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Antisamos_beach.jpg/640px-Antisamos_beach.jpg" onerror="this.parentNode.querySelector('.gallery-loading').style.display='flex';this.style.display='none'" loading="lazy"/>
-    <div class="gallery-loading" style="display:none">&#127958;<br>Antisamos</div>
+  <div class="gallery-card" onclick="window.open('https://www.google.com/search?q=Xi+beach+Kefalonia&tbm=isch','_blank')">
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:6px;">
+      <span style="font-size:28px;">&#127958;</span>
+      <span style="font-size:12px;color:#7a7870;">Ξι</span>
+    </div>
+    <span class="gallery-card-badge">Hari</span>
+    <div class="gallery-card-label">Ξι</div>
+  </div>
+  <div class="gallery-card" onclick="window.open('https://www.google.com/search?q=Antisamos+beach+Kefalonia&tbm=isch','_blank')">
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:6px;">
+      <span style="font-size:28px;">&#127958;</span>
+      <span style="font-size:12px;color:#7a7870;">Antisamos</span>
+    </div>
     <span class="gallery-card-badge mine">Claude</span>
     <div class="gallery-card-label">Antisamos</div>
   </div>
-  <div class="gallery-card" onclick="openGallery('Petani','https://www.google.com/search?q=Petani+beach+Kefalonia&tbm=isch')">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Myrtos_beach_Kefalonia_2010.jpg/640px-Myrtos_beach_Kefalonia_2010.jpg" onerror="this.parentNode.querySelector('.gallery-loading').style.display='flex';this.style.display='none'" loading="lazy"/>
-    <div class="gallery-loading" style="display:none">&#127958;<br>Petani</div>
+  <div class="gallery-card" onclick="window.open('https://www.google.com/search?q=Petani+beach+Kefalonia&tbm=isch','_blank')">
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:6px;">
+      <span style="font-size:28px;">&#127958;</span>
+      <span style="font-size:12px;color:#7a7870;">Petani</span>
+    </div>
     <span class="gallery-card-badge mine">Claude</span>
     <div class="gallery-card-label">Petani</div>
   </div>
@@ -328,56 +356,72 @@ footer{text-align:center;font-size:12px;color:#7a7870;margin-top:2.5rem}
 
 <p class="gallery-section-title">&#9876;&#65039;&#128737;&#65039; Ιθάκη &mdash; Παραλίες</p>
 <div class="gallery-grid">
-  <div class="gallery-card" onclick="openGallery('Φιλιατρό','https://www.google.com/search?q=Filiatro+beach+Ithaca&tbm=isch')">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Filiatro_beach_Ithaca.jpg/640px-Filiatro_beach_Ithaca.jpg" onerror="this.parentNode.querySelector('.gallery-loading').style.display='flex';this.style.display='none'" loading="lazy"/>
-    <div class="gallery-loading" style="display:none">&#127958;<br>Φιλιατρό</div>
+  <div class="gallery-card" onclick="window.open('https://www.google.com/search?q=Filiatro+beach+Ithaca&tbm=isch','_blank')">
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:6px;">
+      <span style="font-size:28px;">&#127958;</span>
+      <span style="font-size:12px;color:#7a7870;">Φιλιατρό</span>
+    </div>
     <span class="gallery-card-badge">Hari</span>
     <div class="gallery-card-label">Φιλιατρό</div>
   </div>
-  <div class="gallery-card" onclick="openGallery('Γιδάκι','https://www.google.com/search?q=Gidaki+beach+Ithaca+Greece&tbm=isch')">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Gidaki_beach_Ithaca.jpg/640px-Gidaki_beach_Ithaca.jpg" onerror="this.parentNode.querySelector('.gallery-loading').style.display='flex';this.style.display='none'" loading="lazy"/>
-    <div class="gallery-loading" style="display:none">&#127958;<br>Γιδάκι</div>
+  <div class="gallery-card" onclick="window.open('https://www.google.com/search?q=Gidaki+beach+Ithaca&tbm=isch','_blank')">
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:6px;">
+      <span style="font-size:28px;">&#127958;</span>
+      <span style="font-size:12px;color:#7a7870;">Γιδάκι</span>
+    </div>
     <span class="gallery-card-badge">Hari</span>
     <div class="gallery-card-label">Γιδάκι</div>
   </div>
-  <div class="gallery-card" onclick="openGallery('Πόλις','https://www.google.com/search?q=Polis+bay+Ithaca+Greece&tbm=isch')">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Gidaki_beach_Ithaca.jpg/640px-Gidaki_beach_Ithaca.jpg" onerror="this.parentNode.querySelector('.gallery-loading').style.display='flex';this.style.display='none'" loading="lazy"/>
-    <div class="gallery-loading" style="display:none">&#127958;<br>Πόλις</div>
+  <div class="gallery-card" onclick="window.open('https://www.google.com/search?q=Polis+bay+Ithaca+Greece&tbm=isch','_blank')">
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:6px;">
+      <span style="font-size:28px;">&#127958;</span>
+      <span style="font-size:12px;color:#7a7870;">Πόλις</span>
+    </div>
     <span class="gallery-card-badge">Hari</span>
     <div class="gallery-card-label">Πόλις</div>
   </div>
-  <div class="gallery-card" onclick="openGallery('Σαρακήνικο','https://www.google.com/search?q=Sarakiniko+beach+Ithaca+Greece&tbm=isch')">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Filiatro_beach_Ithaca.jpg/640px-Filiatro_beach_Ithaca.jpg" onerror="this.parentNode.querySelector('.gallery-loading').style.display='flex';this.style.display='none'" loading="lazy"/>
-    <div class="gallery-loading" style="display:none">&#127958;<br>Σαρακήνικο</div>
+  <div class="gallery-card" onclick="window.open('https://www.google.com/search?q=Sarakiniko+beach+Ithaca&tbm=isch','_blank')">
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:6px;">
+      <span style="font-size:28px;">&#127958;</span>
+      <span style="font-size:12px;color:#7a7870;">Σαρακήνικο</span>
+    </div>
     <span class="gallery-card-badge">Hari</span>
     <div class="gallery-card-label">Σαρακήνικο</div>
   </div>
-  <div class="gallery-card" onclick="openGallery('Σχοινός','https://www.google.com/search?q=Schinos+beach+Ithaca+Greece&tbm=isch')">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Gidaki_beach_Ithaca.jpg/640px-Gidaki_beach_Ithaca.jpg" onerror="this.parentNode.querySelector('.gallery-loading').style.display='flex';this.style.display='none'" loading="lazy"/>
-    <div class="gallery-loading" style="display:none">&#127958;<br>Σχοινός</div>
+  <div class="gallery-card" onclick="window.open('https://www.google.com/search?q=Schinos+beach+Ithaca&tbm=isch','_blank')">
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:6px;">
+      <span style="font-size:28px;">&#127958;</span>
+      <span style="font-size:12px;color:#7a7870;">Σχοινός</span>
+    </div>
     <span class="gallery-card-badge">Hari</span>
     <div class="gallery-card-label">Σχοινός</div>
   </div>
-  <div class="gallery-card" onclick="openGallery('Κουρβουλιά','https://www.google.com/search?q=Kourvoulia+beach+Ithaca+Greece&tbm=isch')">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Filiatro_beach_Ithaca.jpg/640px-Filiatro_beach_Ithaca.jpg" onerror="this.parentNode.querySelector('.gallery-loading').style.display='flex';this.style.display='none'" loading="lazy"/>
-    <div class="gallery-loading" style="display:none">&#127958;<br>Κουρβουλιά</div>
+  <div class="gallery-card" onclick="window.open('https://www.google.com/search?q=Kourvoulia+beach+Ithaca&tbm=isch','_blank')">
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:6px;">
+      <span style="font-size:28px;">&#127958;</span>
+      <span style="font-size:12px;color:#7a7870;">Κουρβουλιά</span>
+    </div>
     <span class="gallery-card-badge">Hari</span>
     <div class="gallery-card-label">Κουρβουλιά</div>
   </div>
-  <div class="gallery-card" onclick="openGallery('Καμίνια','https://www.google.com/search?q=Kaminia+beach+Ithaca+Greece&tbm=isch')">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Gidaki_beach_Ithaca.jpg/640px-Gidaki_beach_Ithaca.jpg" onerror="this.parentNode.querySelector('.gallery-loading').style.display='flex';this.style.display='none'" loading="lazy"/>
-    <div class="gallery-loading" style="display:none">&#127958;<br>Καμίνια</div>
+  <div class="gallery-card" onclick="window.open('https://www.google.com/search?q=Kaminia+beach+Ithaca&tbm=isch','_blank')">
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:6px;">
+      <span style="font-size:28px;">&#127958;</span>
+      <span style="font-size:12px;color:#7a7870;">Καμίνια</span>
+    </div>
     <span class="gallery-card-badge">Hari</span>
     <div class="gallery-card-label">Καμίνια</div>
   </div>
-  <div class="gallery-card" onclick="openGallery('Afales','https://www.google.com/search?q=Afales+beach+Ithaca+Greece&tbm=isch')">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Filiatro_beach_Ithaca.jpg/640px-Filiatro_beach_Ithaca.jpg" onerror="this.parentNode.querySelector('.gallery-loading').style.display='flex';this.style.display='none'" loading="lazy"/>
-    <div class="gallery-loading" style="display:none">&#127958;<br>Afales</div>
+  <div class="gallery-card" onclick="window.open('https://www.google.com/search?q=Afales+beach+Ithaca&tbm=isch','_blank')">
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:6px;">
+      <span style="font-size:28px;">&#127958;</span>
+      <span style="font-size:12px;color:#7a7870;">Afales</span>
+    </div>
     <span class="gallery-card-badge mine">Claude</span>
     <div class="gallery-card-label">Afales</div>
   </div>
 </div>
-<p style="font-size:11px;color:#aaa;text-align:center;margin-top:8px;">&#128247; Tap σε κάθε παραλία για να δεις φωτογραφίες στο Google</p>
+<p style="font-size:11px;color:#aaa;text-align:center;margin-top:8px;margin-bottom:8px;">&#128116; Hari &nbsp;&nbsp; &#10024; Claude</p>
 </div>
 <div class="tab-pane" id="tab-photos">
 
@@ -427,7 +471,7 @@ document.getElementById("heroBg").insertAdjacentHTML("beforeend",
 );
 
 // TABS
-document.getElementById("tabBar").addEventListener("click", function(e) {
+function handleTabClick(e) {
   var btn = e.target.closest(".tab-btn");
   if (!btn) return;
   var tabId = btn.getAttribute("data-tab");
@@ -435,7 +479,9 @@ document.getElementById("tabBar").addEventListener("click", function(e) {
   document.querySelectorAll(".tab-btn").forEach(function(b){ b.classList.remove("active"); });
   document.getElementById("tab-" + tabId).classList.add("active");
   btn.classList.add("active");
-});
+}
+document.getElementById("tabBar").addEventListener("click", handleTabClick);
+document.getElementById("tabBar2").addEventListener("click", handleTabClick);
 
 // COUNTDOWN
 var departure = new Date("2026-07-17T15:45:00");
