@@ -100,6 +100,8 @@ footer{text-align:center;font-size:12px;color:#7a7870;margin-top:2.5rem}
 .uploaded-img-author{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.6));color:#fff;font-size:11px;font-weight:600;padding:16px 42px 6px 8px;text-align:center}
 .download-photo-btn{position:absolute;right:8px;bottom:6px;width:28px;height:28px;border-radius:50%;border:none;background:rgba(255,255,255,.92);color:#2a5fa5;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.18)}
 .download-photo-btn:hover{background:#fff;transform:scale(1.04)}
+.delete-photo-btn{position:absolute;right:8px;top:8px;width:28px;height:28px;border-radius:50%;border:none;background:rgba(255,255,255,.92);color:#e53935;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.delete-photo-btn:hover{background:#fff;transform:scale(1.04)}
 .upload-status{display:none;background:#fff;border-radius:12px;border:1px solid rgba(0,0,0,.08);padding:10px 12px;margin-top:12px;font-size:12px;color:#7a7870;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,.05)}
 .upload-status.show{display:block}
 .upload-status strong{color:#2a5fa5}
@@ -814,9 +816,21 @@ function addPhotoToGrid(photo, insertFirst) {
     downloadPhoto(photo.url, "kefalonia-ithaki-" + safeName + ".jpg");
   });
 
+  var del = document.createElement("button");
+  del.className = "delete-photo-btn";
+  del.type = "button";
+  del.title = "Delete photo";
+  del.setAttribute("aria-label", "Delete photo");
+  del.innerHTML = "&#128465;";
+  del.addEventListener("click", function(e) {
+    e.stopPropagation();
+    confirmAndDeletePhoto(photo);
+  });
+
   wrap.appendChild(img);
   wrap.appendChild(lbl);
   wrap.appendChild(download);
+  wrap.appendChild(del);
   if (insertFirst) grid.insertBefore(wrap, grid.firstChild);
   else grid.appendChild(wrap);
 }
@@ -879,6 +893,40 @@ async function savePhotoRecordToSupabase(photo) {
   return await response.json();
 }
 
+async function deletePhotoRecordFromSupabase(photoId) {
+  if (!photoId) throw new Error("Missing photo id");
+  var response = await fetch(SUPABASE_PHOTOS_ENDPOINT + "?id=eq." + encodeURIComponent(photoId), {
+    method: "DELETE",
+    headers: supabaseHeaders({ "Prefer": "return=minimal" })
+  });
+  if (!response.ok) {
+    var txt = await response.text();
+    throw new Error(txt || "Supabase delete failed");
+  }
+}
+
+async function confirmAndDeletePhoto(photo) {
+  if (!photo || !photo.id) {
+    alert("Δεν μπορώ να διαγράψω αυτή τη φωτογραφία γιατί λείπει το Supabase ID.");
+    return;
+  }
+  var ok = confirm("Να διαγραφεί αυτή η φωτογραφία από το κοινό gallery για όλους;");
+  if (!ok) return;
+
+  try {
+    setPhotoUploadStatus("Διαγραφή φωτογραφίας...", true);
+    await deletePhotoRecordFromSupabase(photo.id);
+    uploadedPhotos = uploadedPhotos.filter(function(p) { return String(p.id) !== String(photo.id); });
+    renderPhotos(uploadedPhotos);
+    setPhotoUploadStatus("&#10003; Η φωτογραφία διαγράφηκε από το κοινό gallery για όλους.", true);
+    setTimeout(function(){ setPhotoUploadStatus("", false); }, 2500);
+  } catch (err) {
+    console.error(err);
+    setPhotoUploadStatus("Delete error: " + (err.message || err), true);
+    alert("Δεν έγινε διαγραφή. Έλεγξε ότι έχεις ενεργοποιήσει DELETE policy στο Supabase.");
+  }
+}
+
 document.getElementById("photoNameSaveBtn").addEventListener("click", function() {
   var n = document.getElementById("photoNameInput").value.trim();
   if (!n) { alert("Γράψε το όνομά σου!"); return; }
@@ -928,7 +976,8 @@ document.getElementById("photoFileInput").addEventListener("change", async funct
         uploadedAt: new Date().toISOString()
       };
 
-      await savePhotoRecordToSupabase(photo);
+      var savedRows = await savePhotoRecordToSupabase(photo);
+      if (savedRows && savedRows[0] && savedRows[0].id) photo.id = savedRows[0].id;
       uploadedCount++;
       addPhotoToGrid(photo, true);
       setPhotoUploadStatus("&#10003; Uploaded <strong>" + uploadedCount + "/" + files.length + "</strong>. Τώρα τη βλέπουν όλοι.", true);
