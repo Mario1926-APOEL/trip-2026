@@ -22,9 +22,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Ar
 .progress-meta{display:flex;justify-content:space-between;font-size:12px;color:#7a7870;margin-bottom:6px}
 .progress-track{background:rgba(0,0,0,.08);border-radius:99px;height:6px;overflow:hidden}
 .progress-fill{height:100%;background:#2a5fa5;border-radius:99px;transition:width .6s ease}
-.tab-bar{display:flex;gap:6px;margin:0 0 4px;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.tab-bar{display:flex;gap:5px;margin:0 0 8px;overflow-x:auto;padding:4px 2px 6px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 .tab-bar::-webkit-scrollbar{display:none}
-.tab-btn{flex-shrink:0;padding:8px 16px;border-radius:99px;border:1.5px solid rgba(0,0,0,.12);background:#fff;font-size:13px;font-weight:500;cursor:pointer;color:#7a7870;white-space:nowrap;transition:all .18s}
+.tab-btn{flex-shrink:0;padding:7px 12px;border-radius:99px;border:1.5px solid rgba(0,0,0,.12);background:#fff;font-size:12px;font-weight:500;cursor:pointer;color:#7a7870;white-space:nowrap;transition:all .18s}
 .tab-btn.active{background:#2a5fa5;color:#fff;border-color:#2a5fa5}
 .tab-pane{display:none}
 .tab-pane.active{display:block}
@@ -79,6 +79,32 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Ar
 .map-cat{font-size:11px;color:#7a7870}
 .map-arrow{font-size:18px;color:#2a5fa5}
 footer{text-align:center;font-size:12px;color:#7a7870;margin-top:2.5rem}
+.gallery-section-title{font-size:18px;font-weight:700;color:#1a1a18;margin:1.5rem 0 .75rem;padding-bottom:6px;border-bottom:2px solid #2a5fa5}
+.gallery-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:1.5rem}
+.gallery-card{border-radius:14px;overflow:hidden;position:relative;aspect-ratio:4/3;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,.1);background:#e8f0fb;}
+.gallery-card img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s ease}
+.gallery-card:hover img{transform:scale(1.05)}
+.gallery-card-label{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.7));color:#fff;font-size:12px;font-weight:600;padding:20px 10px 8px;text-align:center}
+.gallery-card-badge{position:absolute;top:8px;right:8px;background:#2a5fa5;color:#fff;font-size:10px;font-weight:600;padding:2px 7px;border-radius:99px}
+.gallery-card-badge.mine{background:#7c3aed}
+.gallery-loading{display:flex;align-items:center;justify-content:center;height:100%;color:#7a7870;font-size:12px;flex-direction:column;gap:4px}
+.upload-area{background:#fff;border-radius:14px;border:2px dashed #2a5fa5;padding:2rem;text-align:center;margin-top:16px;cursor:pointer}
+.upload-area:hover{background:#f0f5ff}
+.upload-icon{font-size:40px;margin-bottom:8px}
+.upload-text{font-size:14px;font-weight:600;color:#2a5fa5;margin-bottom:4px}
+.upload-sub{font-size:12px;color:#7a7870}
+.upload-input{display:none}
+.uploaded-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:16px}
+.uploaded-img-wrap{border-radius:12px;overflow:hidden;position:relative;aspect-ratio:4/3;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.uploaded-img-wrap img{width:100%;height:100%;object-fit:cover}
+.uploaded-img-author{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.6));color:#fff;font-size:11px;font-weight:600;padding:16px 8px 6px;text-align:center}
+.upload-btn{background:#2a5fa5;color:#fff;border:none;border-radius:10px;padding:10px 24px;font-size:14px;font-weight:600;cursor:pointer;margin-top:12px;display:inline-block}
+.photo-name-bar{background:#fff;border-radius:14px;border:1px solid rgba(0,0,0,.08);box-shadow:0 2px 12px rgba(0,0,0,.06);padding:.9rem 1.25rem;margin-top:16px;display:flex;align-items:center;gap:10px}
+.lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:1000;align-items:center;justify-content:center;flex-direction:column}
+.lightbox.open{display:flex}
+.lightbox img{max-width:95vw;max-height:80vh;border-radius:8px;object-fit:contain}
+.lightbox-close{position:absolute;top:16px;right:16px;background:none;border:none;color:#fff;font-size:28px;cursor:pointer}
+.lightbox-label{color:#fff;font-size:14px;margin-top:12px;font-weight:600}
 .wa-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#25D366;color:#fff;border-radius:14px;padding:14px 20px;box-shadow:0 4px 20px rgba(0,0,0,0.2);display:flex;align-items:center;gap:12px;max-width:340px;width:90%;z-index:999;opacity:0;transition:opacity 0.3s ease;pointer-events:none}
 .wa-toast.show{opacity:1;pointer-events:auto}
 .wa-toast-icon{font-size:22px;flex-shrink:0}
@@ -108,6 +134,8 @@ footer{text-align:center;font-size:12px;color:#7a7870;margin-top:2.5rem}
   <button class="tab-btn" data-tab="claude">&#10024; Ιδέες Claude</button>
   <button class="tab-btn" data-tab="program">&#128336; Πρόγραμμα</button>
   <button class="tab-btn" data-tab="maps">&#128205; Maps</button>
+  <button class="tab-btn" data-tab="gallery">&#127956; Gallery</button>
+  <button class="tab-btn" data-tab="photos">&#128247; Φωτογραφίες</button>
 </div>
 <div class="tab-pane active" id="tab-trip">
   <p class="section-label">Πτήσεις</p>
@@ -237,7 +265,150 @@ footer{text-align:center;font-size:12px;color:#7a7870;margin-top:2.5rem}
 <a class="map-card" href="https://maps.google.com/?q=Frikes+Ithaca+Greece" target="_blank"><div class="map-icon map-visit">&#128674;</div><div class="map-body"><div class="map-name">Φρίκες</div><div class="map-cat">Ψαροχώρι &bull; Αυθεντική ατμόσφαιρα</div></div><div class="map-arrow">&#8599;</div></a>
 <a class="map-card" href="https://maps.google.com/?q=Homer+School+Ithaca+Greece+Exogi" target="_blank"><div class="map-icon map-visit">&#128205;</div><div class="map-body"><div class="map-name">Homer's School</div><div class="map-cat">Ανάκτορο Οδυσσέα &bull; Εξωγή</div></div><div class="map-arrow">&#8599;</div></a>
 </div>
+<div class="tab-pane" id="tab-gallery">
+<p style="font-size:13px;color:#7a7870;text-align:center;margin-top:12px;margin-bottom:4px;">Κάνε tap για να δεις φωτογραφίες &#128247;</p>
+
+<p class="gallery-section-title">&#127958; Κεφαλονιά &mdash; Παραλίες</p>
+<div class="gallery-grid">
+  <div class="gallery-card" onclick="openGallery('Φτερή','https://www.google.com/search?q=Fteri+beach+Kefalonia&tbm=isch')">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Fteri_beach_Kefalonia.jpg/640px-Fteri_beach_Kefalonia.jpg" onerror="this.parentNode.querySelector('.gallery-loading').style.display='flex';this.style.display='none'" loading="lazy"/>
+    <div class="gallery-loading" style="display:none">&#127958;<br>Φτερή</div>
+    <span class="gallery-card-badge">Hari</span>
+    <div class="gallery-card-label">Φτερή</div>
+  </div>
+  <div class="gallery-card" onclick="openGallery('Μύρτος','https://www.google.com/search?q=Myrtos+beach+Kefalonia&tbm=isch')">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Myrtos_beach_Kefalonia_2010.jpg/640px-Myrtos_beach_Kefalonia_2010.jpg" onerror="this.parentNode.querySelector('.gallery-loading').style.display='flex';this.style.display='none'" loading="lazy"/>
+    <div class="gallery-loading" style="display:none">&#127958;<br>Μύρτος</div>
+    <span class="gallery-card-badge">Hari</span>
+    <div class="gallery-card-label">Μύρτος</div>
+  </div>
+  <div class="gallery-card" onclick="openGallery('Φωκί','https://www.google.com/search?q=Foki+beach+Kefalonia&tbm=isch')">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Fiskardo_Kefalonia_Greece.jpg/640px-Fiskardo_Kefalonia_Greece.jpg" onerror="this.parentNode.querySelector('.gallery-loading').style.display='flex';this.style.display='none'" loading="lazy"/>
+    <div class="gallery-loading" style="display:none">&#127958;<br>Φωκί</div>
+    <span class="gallery-card-badge">Hari</span>
+    <div class="gallery-card-label">Φωκί</div>
+  </div>
+  <div class="gallery-card" onclick="openGallery('Βουτή','https://www.google.com/search?q=Vouti+beach+Kefalonia&tbm=isch')">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Antisamos_beach.jpg/640px-Antisamos_beach.jpg" onerror="this.parentNode.querySelector('.gallery-loading').style.display='flex';this.style.display='none'" loading="lazy"/>
+    <div class="gallery-loading" style="display:none">&#127958;<br>Βουτή</div>
+    <span class="gallery-card-badge">Hari</span>
+    <div class="gallery-card-label">Βουτή</div>
+  </div>
+  <div class="gallery-card" onclick="openGallery('Κιμηλιά','https://www.google.com/search?q=Kimilia+beach+Kefalonia&tbm=isch')">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Xi_beach_Kefalonia.jpg/640px-Xi_beach_Kefalonia.jpg" onerror="this.parentNode.querySelector('.gallery-loading').style.display='flex';this.style.display='none'" loading="lazy"/>
+    <div class="gallery-loading" style="display:none">&#127958;<br>Κιμηλιά</div>
+    <span class="gallery-card-badge">Hari</span>
+    <div class="gallery-card-label">Κιμηλιά</div>
+  </div>
+  <div class="gallery-card" onclick="openGallery('Ξι','https://www.google.com/search?q=Xi+beach+Kefalonia&tbm=isch')">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Xi_beach_Kefalonia.jpg/640px-Xi_beach_Kefalonia.jpg" onerror="this.parentNode.querySelector('.gallery-loading').style.display='flex';this.style.display='none'" loading="lazy"/>
+    <div class="gallery-loading" style="display:none">&#127958;<br>Ξι</div>
+    <span class="gallery-card-badge">Hari</span>
+    <div class="gallery-card-label">Ξι (Xi Beach)</div>
+  </div>
+  <div class="gallery-card" onclick="openGallery('Δαφνούδι','https://www.google.com/search?q=Dafnoudi+beach+Kefalonia&tbm=isch')">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Myrtos_beach_Kefalonia_2010.jpg/640px-Myrtos_beach_Kefalonia_2010.jpg" onerror="this.parentNode.querySelector('.gallery-loading').style.display='flex';this.style.display='none'" loading="lazy"/>
+    <div class="gallery-loading" style="display:none">&#127958;<br>Δαφνούδι</div>
+    <span class="gallery-card-badge">Hari</span>
+    <div class="gallery-card-label">Δαφνούδι</div>
+  </div>
+  <div class="gallery-card" onclick="openGallery('Antisamos','https://www.google.com/search?q=Antisamos+beach+Kefalonia&tbm=isch')">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Antisamos_beach.jpg/640px-Antisamos_beach.jpg" onerror="this.parentNode.querySelector('.gallery-loading').style.display='flex';this.style.display='none'" loading="lazy"/>
+    <div class="gallery-loading" style="display:none">&#127958;<br>Antisamos</div>
+    <span class="gallery-card-badge mine">Claude</span>
+    <div class="gallery-card-label">Antisamos</div>
+  </div>
+  <div class="gallery-card" onclick="openGallery('Petani','https://www.google.com/search?q=Petani+beach+Kefalonia&tbm=isch')">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Myrtos_beach_Kefalonia_2010.jpg/640px-Myrtos_beach_Kefalonia_2010.jpg" onerror="this.parentNode.querySelector('.gallery-loading').style.display='flex';this.style.display='none'" loading="lazy"/>
+    <div class="gallery-loading" style="display:none">&#127958;<br>Petani</div>
+    <span class="gallery-card-badge mine">Claude</span>
+    <div class="gallery-card-label">Petani</div>
+  </div>
+</div>
+
+<p class="gallery-section-title">&#9876;&#65039;&#128737;&#65039; Ιθάκη &mdash; Παραλίες</p>
+<div class="gallery-grid">
+  <div class="gallery-card" onclick="openGallery('Φιλιατρό','https://www.google.com/search?q=Filiatro+beach+Ithaca&tbm=isch')">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Filiatro_beach_Ithaca.jpg/640px-Filiatro_beach_Ithaca.jpg" onerror="this.parentNode.querySelector('.gallery-loading').style.display='flex';this.style.display='none'" loading="lazy"/>
+    <div class="gallery-loading" style="display:none">&#127958;<br>Φιλιατρό</div>
+    <span class="gallery-card-badge">Hari</span>
+    <div class="gallery-card-label">Φιλιατρό</div>
+  </div>
+  <div class="gallery-card" onclick="openGallery('Γιδάκι','https://www.google.com/search?q=Gidaki+beach+Ithaca+Greece&tbm=isch')">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Gidaki_beach_Ithaca.jpg/640px-Gidaki_beach_Ithaca.jpg" onerror="this.parentNode.querySelector('.gallery-loading').style.display='flex';this.style.display='none'" loading="lazy"/>
+    <div class="gallery-loading" style="display:none">&#127958;<br>Γιδάκι</div>
+    <span class="gallery-card-badge">Hari</span>
+    <div class="gallery-card-label">Γιδάκι</div>
+  </div>
+  <div class="gallery-card" onclick="openGallery('Πόλις','https://www.google.com/search?q=Polis+bay+Ithaca+Greece&tbm=isch')">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Gidaki_beach_Ithaca.jpg/640px-Gidaki_beach_Ithaca.jpg" onerror="this.parentNode.querySelector('.gallery-loading').style.display='flex';this.style.display='none'" loading="lazy"/>
+    <div class="gallery-loading" style="display:none">&#127958;<br>Πόλις</div>
+    <span class="gallery-card-badge">Hari</span>
+    <div class="gallery-card-label">Πόλις</div>
+  </div>
+  <div class="gallery-card" onclick="openGallery('Σαρακήνικο','https://www.google.com/search?q=Sarakiniko+beach+Ithaca+Greece&tbm=isch')">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Filiatro_beach_Ithaca.jpg/640px-Filiatro_beach_Ithaca.jpg" onerror="this.parentNode.querySelector('.gallery-loading').style.display='flex';this.style.display='none'" loading="lazy"/>
+    <div class="gallery-loading" style="display:none">&#127958;<br>Σαρακήνικο</div>
+    <span class="gallery-card-badge">Hari</span>
+    <div class="gallery-card-label">Σαρακήνικο</div>
+  </div>
+  <div class="gallery-card" onclick="openGallery('Σχοινός','https://www.google.com/search?q=Schinos+beach+Ithaca+Greece&tbm=isch')">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Gidaki_beach_Ithaca.jpg/640px-Gidaki_beach_Ithaca.jpg" onerror="this.parentNode.querySelector('.gallery-loading').style.display='flex';this.style.display='none'" loading="lazy"/>
+    <div class="gallery-loading" style="display:none">&#127958;<br>Σχοινός</div>
+    <span class="gallery-card-badge">Hari</span>
+    <div class="gallery-card-label">Σχοινός</div>
+  </div>
+  <div class="gallery-card" onclick="openGallery('Κουρβουλιά','https://www.google.com/search?q=Kourvoulia+beach+Ithaca+Greece&tbm=isch')">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Filiatro_beach_Ithaca.jpg/640px-Filiatro_beach_Ithaca.jpg" onerror="this.parentNode.querySelector('.gallery-loading').style.display='flex';this.style.display='none'" loading="lazy"/>
+    <div class="gallery-loading" style="display:none">&#127958;<br>Κουρβουλιά</div>
+    <span class="gallery-card-badge">Hari</span>
+    <div class="gallery-card-label">Κουρβουλιά</div>
+  </div>
+  <div class="gallery-card" onclick="openGallery('Καμίνια','https://www.google.com/search?q=Kaminia+beach+Ithaca+Greece&tbm=isch')">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Gidaki_beach_Ithaca.jpg/640px-Gidaki_beach_Ithaca.jpg" onerror="this.parentNode.querySelector('.gallery-loading').style.display='flex';this.style.display='none'" loading="lazy"/>
+    <div class="gallery-loading" style="display:none">&#127958;<br>Καμίνια</div>
+    <span class="gallery-card-badge">Hari</span>
+    <div class="gallery-card-label">Καμίνια</div>
+  </div>
+  <div class="gallery-card" onclick="openGallery('Afales','https://www.google.com/search?q=Afales+beach+Ithaca+Greece&tbm=isch')">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Filiatro_beach_Ithaca.jpg/640px-Filiatro_beach_Ithaca.jpg" onerror="this.parentNode.querySelector('.gallery-loading').style.display='flex';this.style.display='none'" loading="lazy"/>
+    <div class="gallery-loading" style="display:none">&#127958;<br>Afales</div>
+    <span class="gallery-card-badge mine">Claude</span>
+    <div class="gallery-card-label">Afales</div>
+  </div>
+</div>
+<p style="font-size:11px;color:#aaa;text-align:center;margin-top:8px;">&#128247; Tap σε κάθε παραλία για να δεις φωτογραφίες στο Google</p>
+</div>
+<div class="tab-pane" id="tab-photos">
+
+  <!-- NAME BAR -->
+  <div class="photo-name-bar">
+    <label style="font-size:13px;color:#7a7870;white-space:nowrap">&#128100; Όνομά σου:</label>
+    <input class="name-input" id="photoNameInput" type="text" placeholder="π.χ. Μάριος" maxlength="20"/>
+    <button class="name-save-btn" id="photoNameSaveBtn">OK</button>
+  </div>
+
+  <!-- UPLOAD AREA -->
+  <div class="upload-area" id="uploadArea">
+    <div class="upload-icon">&#128247;</div>
+    <div class="upload-text">Πρόσθεσε φωτογραφία από το ταξίδι</div>
+    <div class="upload-sub">Tap για να επιλέξεις από τη συλλογή σου</div>
+    <button class="upload-btn" id="uploadTriggerBtn">&#128247; Επιλογή φωτογραφίας</button>
+    <input type="file" id="photoFileInput" class="upload-input" accept="image/*" multiple/>
+  </div>
+
+  <!-- UPLOADED PHOTOS GRID -->
+  <div class="uploaded-grid" id="uploadedGrid"></div>
+
+
+</div>
 <footer>Ανανεώνεται κάθε 30 δευτερόλεπτα &bull; Notes αποθηκεύονται online</footer>
+</div>
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" id="lightboxClose">&#10005;</button>
+  <img id="lightboxImg" src="" alt=""/>
+  <div class="lightbox-label" id="lightboxLabel"></div>
+  <p style="color:rgba(255,255,255,.6);font-size:12px;margin-top:8px;">Tap για περισσότερες φωτογραφίες &#8599;</p>
 </div>
 <div class="wa-toast" id="waToast">
   <div class="wa-toast-icon">&#128172;</div>
@@ -459,6 +630,71 @@ function saveData() {
   .then(function(){ setStatus("&#10003; " + new Date().toLocaleTimeString("el-GR",{hour:"2-digit",minute:"2-digit"})); })
   .catch(function(){ setStatus("&#10005; \u03a3\u03c6\u03ac\u03bb\u03bc\u03b1."); });
 }
+
+// GALLERY
+function openGallery(name, url) {
+  window.open(url, "_blank");
+}
+
+
+
+document.getElementById("lightboxClose").addEventListener("click", function() {
+  document.getElementById("lightbox").classList.remove("open");
+});
+document.getElementById("lightbox").addEventListener("click", function(e) {
+  if (e.target === this) this.classList.remove("open");
+});
+
+// PHOTO UPLOAD
+var photoUserName = localStorage.getItem("photoUserName") || "";
+if (photoUserName && document.getElementById("photoNameInput")) {
+  document.getElementById("photoNameInput").value = photoUserName;
+}
+
+document.getElementById("photoNameSaveBtn").addEventListener("click", function() {
+  var n = document.getElementById("photoNameInput").value.trim();
+  if (!n) { alert("Γράψε το όνομά σου!"); return; }
+  photoUserName = n;
+  localStorage.setItem("photoUserName", n);
+  alert("Αποθηκεύτηκε: " + n);
+});
+
+document.getElementById("uploadTriggerBtn").addEventListener("click", function(e) {
+  e.stopPropagation();
+  document.getElementById("photoFileInput").click();
+});
+
+document.getElementById("uploadArea").addEventListener("click", function() {
+  document.getElementById("photoFileInput").click();
+});
+
+document.getElementById("photoFileInput").addEventListener("change", function(e) {
+  if (!photoUserName) { alert("Γράψε πρώτα το όνομά σου!"); return; }
+  var files = e.target.files;
+  var grid = document.getElementById("uploadedGrid");
+  Array.from(files).forEach(function(file) {
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+      var wrap = document.createElement("div");
+      wrap.className = "uploaded-img-wrap";
+      var img = document.createElement("img");
+      img.src = ev.target.result;
+      img.addEventListener("click", function() {
+        document.getElementById("lightboxImg").src = ev.target.result;
+        document.getElementById("lightboxLabel").textContent = photoUserName;
+        document.getElementById("lightbox").classList.add("open");
+      });
+      var lbl = document.createElement("div");
+      lbl.className = "uploaded-img-author";
+      lbl.textContent = photoUserName;
+      wrap.appendChild(img);
+      wrap.appendChild(lbl);
+      grid.insertBefore(wrap, grid.firstChild);
+    };
+    reader.readAsDataURL(file);
+  });
+  e.target.value = "";
+});
 
 fetchData();
 setInterval(fetchData, 30000);
