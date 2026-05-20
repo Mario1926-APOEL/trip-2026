@@ -94,7 +94,7 @@ footer{text-align:center;font-size:12px;color:#7a7870;margin-top:2.5rem}
 .gallery-card-badge{position:absolute;top:8px;right:8px;background:#2a5fa5;color:#fff;font-size:10px;font-weight:600;padding:2px 7px;border-radius:99px}
 .gallery-card-badge.mine{background:#7c3aed}
 .gallery-loading{display:flex;align-items:center;justify-content:center;height:100%;color:#7a7870;font-size:12px;flex-direction:column;gap:4px}
-.upload-area{background:#fff;border-radius:14px;border:2px dashed #2a5fa5;padding:2rem;text-align:center;margin-top:16px;cursor:pointer}
+.upload-area{background:#fff;border-radius:14px;border:2px dashed #2a5fa5;padding:2rem;text-align:center;margin-top:16px;cursor:default}
 .upload-area:hover{background:#f0f5ff}
 .upload-icon{font-size:40px;margin-bottom:8px}
 .upload-text{font-size:14px;font-weight:600;color:#2a5fa5;margin-bottom:4px}
@@ -1085,24 +1085,33 @@ document.getElementById("photoNameSaveBtn").addEventListener("click", function()
 });
 
 document.getElementById("uploadTriggerBtn").addEventListener("click", function(e) {
+  e.preventDefault();
   e.stopPropagation();
   document.getElementById("photoFileInput").click();
 });
 
 document.getElementById("photoCameraTriggerBtn").addEventListener("click", function(e) {
+  e.preventDefault();
   e.stopPropagation();
   document.getElementById("photoCameraFileInput").click();
 });
 
 document.getElementById("videoCameraTriggerBtn").addEventListener("click", function(e) {
+  e.preventDefault();
   e.stopPropagation();
   document.getElementById("videoCameraFileInput").click();
 });
 
-document.getElementById("uploadArea").addEventListener("click", function(e) {
-  if (e.target.closest("button")) return;
-  document.getElementById("photoFileInput").click();
-});
+// Important: the whole upload box is not clickable anymore.
+// Only the three buttons open a picker/camera. This prevents mobile browsers from opening gallery first and then camera.
+
+function getSelectedMediaType(file) {
+  var name = (file && file.name ? file.name : "").toLowerCase();
+  var type = (file && file.type ? file.type : "").toLowerCase();
+  if (type.indexOf("video/") === 0 || /\.(mp4|mov|m4v|webm|avi|3gp)$/i.test(name)) return "video";
+  if (type.indexOf("image/") === 0 || /\.(jpg|jpeg|png|gif|webp|heic|heif)$/i.test(name)) return "image";
+  return "";
+}
 
 async function handlePhotoFiles(e) {
   if (!photoUserName) { alert("Γράψε πρώτα το όνομά σου!"); e.target.value = ""; return; }
@@ -1114,9 +1123,13 @@ async function handlePhotoFiles(e) {
 
   for (var i = 0; i < files.length; i++) {
     var file = files[i];
-    var isVideo = file.type && file.type.startsWith("video/");
-    var isImage = file.type && file.type.startsWith("image/");
-    if (!isImage && !isVideo) continue;
+    var selectedType = getSelectedMediaType(file);
+    var isVideo = selectedType === "video";
+    var isImage = selectedType === "image";
+    if (!selectedType) {
+      setPhotoUploadStatus("Skipped unsupported file: " + (file.name || "unknown"), true);
+      continue;
+    }
 
     var formData = new FormData();
     formData.append("file", file);
@@ -1125,11 +1138,12 @@ async function handlePhotoFiles(e) {
     formData.append("context", "author=" + photoUserName);
 
     try {
-      var uploadUrl = "https://api.cloudinary.com/v1_1/" + CLOUDINARY_CLOUD_NAME + "/" + (isVideo ? "video" : "image") + "/upload";
+      // Use /auto/upload so the same unsigned preset can accept both images and videos.
+      var uploadUrl = "https://api.cloudinary.com/v1_1/" + CLOUDINARY_CLOUD_NAME + "/auto/upload";
       var cloudinaryResponse = await fetch(uploadUrl, { method: "POST", body: formData });
       var cloudinaryData = await cloudinaryResponse.json();
       if (!cloudinaryResponse.ok || !cloudinaryData.secure_url) {
-        throw new Error(cloudinaryData.error && cloudinaryData.error.message ? cloudinaryData.error.message : (isVideo ? "Cloudinary video upload failed. Check that your unsigned upload preset allows videos." : "Cloudinary upload failed"));
+        throw new Error(cloudinaryData.error && cloudinaryData.error.message ? cloudinaryData.error.message : "Cloudinary upload failed. Check that your upload preset allows images and videos.");
       }
 
       var photo = {
