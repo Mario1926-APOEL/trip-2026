@@ -120,9 +120,60 @@ footer{text-align:center;font-size:12px;color:#7a7870;margin-top:2.5rem}
 .wa-toast-msg{font-size:12px;opacity:0.9}
 .wa-toast-btn{background:#fff;color:#25D366;border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:5px}
 .wa-toast-close{background:none;border:none;color:rgba(255,255,255,0.7);font-size:18px;cursor:pointer;padding:0;line-height:1;flex-shrink:0}
+
+/* Dark mode toggle */
+.theme-toggle{position:fixed;top:14px;right:14px;z-index:1200;background:rgba(255,255,255,.92);color:#1a1a18;border:1px solid rgba(0,0,0,.12);border-radius:999px;padding:8px 12px;font-size:13px;font-weight:700;box-shadow:0 4px 18px rgba(0,0,0,.18);cursor:pointer;backdrop-filter:blur(8px)}
+.theme-toggle:active{transform:scale(.98)}
+body.dark-mode{background:#101418;color:#f3f4f6}
+body.dark-mode .theme-toggle{background:rgba(27,32,38,.92);color:#f3f4f6;border-color:rgba(255,255,255,.15)}
+body.dark-mode .cd-card,
+body.dark-mode .card,
+body.dark-mode .notes-card,
+body.dark-mode .name-bar,
+body.dark-mode .photo-name-bar,
+body.dark-mode .map-card,
+body.dark-mode .upload-area{background:#1b2026;color:#f3f4f6;border-color:rgba(255,255,255,.10);box-shadow:0 2px 14px rgba(0,0,0,.35)}
+body.dark-mode .tab-btn{background:#1b2026;color:#cbd5e1;border-color:rgba(255,255,255,.14)}
+body.dark-mode .tab-btn.active{background:#4f8fe8;color:#fff;border-color:#4f8fe8}
+body.dark-mode .card-name,
+body.dark-mode .card-price,
+body.dark-mode .island-title,
+body.dark-mode .map-island,
+body.dark-mode .map-name,
+body.dark-mode .gallery-section-title,
+body.dark-mode .note-text,
+body.dark-mode .claude-text{color:#f3f4f6}
+body.dark-mode .card-detail,
+body.dark-mode .section-label,
+body.dark-mode .progress-meta,
+body.dark-mode .sync-status,
+body.dark-mode footer,
+body.dark-mode .map-cat,
+body.dark-mode .upload-sub,
+body.dark-mode .gallery-loading,
+body.dark-mode .name-bar label,
+body.dark-mode .photo-name-bar label{color:#a7b0bd}
+body.dark-mode .name-input,
+body.dark-mode .add-note-input{background:#11161c;color:#f3f4f6;border-color:rgba(255,255,255,.16)}
+body.dark-mode .name-input::placeholder,
+body.dark-mode .add-note-input::placeholder{color:#7b8491}
+body.dark-mode .progress-track{background:rgba(255,255,255,.14)}
+body.dark-mode .progress-fill{background:#4f8fe8}
+body.dark-mode .island-title,
+body.dark-mode .map-island,
+body.dark-mode .gallery-section-title{border-bottom-color:#4f8fe8}
+body.dark-mode .notes-cat-title{color:#7fb0ff}
+body.dark-mode .note-item,
+body.dark-mode .claude-note{border-bottom-color:rgba(255,255,255,.08)}
+body.dark-mode .gallery-card{background:#1b2026;box-shadow:0 2px 12px rgba(0,0,0,.35)}
+body.dark-mode .badge-pending{background:#3a2a12;color:#ffcc80}
+body.dark-mode .badge-ok{background:#12382d;color:#7ee6c4}
+
 </style>
 </head>
 <body>
+<button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode">🌙 Dark</button>
+
 <div class="hero-bg" id="heroBg"></div>
 <div class="container">
 <div class="countdown-row">
@@ -725,6 +776,10 @@ var SUPABASE_URL = "https://thecperzyfoaphjthnyf.supabase.co";
 var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRoZWNwZXJ6eWZvYXBoanRobnlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyNzYyNzksImV4cCI6MjA5NDg1MjI3OX0.KciBKdrZK4DH79HUpkJ5EQxTYOW0N3o9s_4EcqIFNeM";
 var SUPABASE_PHOTOS_ENDPOINT = SUPABASE_URL + "/rest/v1/trip_photos";
 
+// Vercel API endpoint that securely deletes the real image from Cloudinary.
+// After deploying the Vercel project, replace YOUR-VERCEL-APP with your Vercel app URL.
+var CLOUDINARY_DELETE_API_URL = "https://kefalonia-delete-api.vercel.app/api/delete-cloudinary";
+
 var photoUserName = localStorage.getItem("photoUserName") || "";
 var uploadedPhotos = [];
 
@@ -905,25 +960,52 @@ async function deletePhotoRecordFromSupabase(photoId) {
   }
 }
 
+async function deletePhotoFromCloudinary(publicId) {
+  if (!publicId) throw new Error("Missing Cloudinary public_id");
+  if (!CLOUDINARY_DELETE_API_URL || CLOUDINARY_DELETE_API_URL.indexOf("YOUR-VERCEL-APP") !== -1) {
+    throw new Error("Set your Vercel delete API URL first");
+  }
+  var response = await fetch(CLOUDINARY_DELETE_API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ public_id: publicId })
+  });
+  var data = null;
+  try { data = await response.json(); } catch(e) {}
+  if (!response.ok || !data || !data.ok) {
+    throw new Error((data && data.error) ? data.error : "Cloudinary delete failed");
+  }
+  return data;
+}
+
 async function confirmAndDeletePhoto(photo) {
   if (!photo || !photo.id) {
     alert("Δεν μπορώ να διαγράψω αυτή τη φωτογραφία γιατί λείπει το Supabase ID.");
     return;
   }
-  var ok = confirm("Να διαγραφεί αυτή η φωτογραφία από το κοινό gallery για όλους;");
+  if (!photo.publicId) {
+    alert("Δεν μπορώ να σβήσω από Cloudinary γιατί λείπει το public_id. Θα πρέπει να γίνει re-upload με τη νέα έκδοση.");
+    return;
+  }
+
+  var ok = confirm("Να διαγραφεί αυτή η φωτογραφία από Cloudinary ΚΑΙ από το κοινό gallery για όλους;");
   if (!ok) return;
 
   try {
-    setPhotoUploadStatus("Διαγραφή φωτογραφίας...", true);
+    setPhotoUploadStatus("Διαγραφή από Cloudinary...", true);
+    await deletePhotoFromCloudinary(photo.publicId);
+
+    setPhotoUploadStatus("Διαγραφή από Supabase gallery...", true);
     await deletePhotoRecordFromSupabase(photo.id);
+
     uploadedPhotos = uploadedPhotos.filter(function(p) { return String(p.id) !== String(photo.id); });
     renderPhotos(uploadedPhotos);
-    setPhotoUploadStatus("&#10003; Η φωτογραφία διαγράφηκε από το κοινό gallery για όλους.", true);
-    setTimeout(function(){ setPhotoUploadStatus("", false); }, 2500);
+    setPhotoUploadStatus("&#10003; Η φωτογραφία διαγράφηκε από Cloudinary και από το κοινό gallery για όλους.", true);
+    setTimeout(function(){ setPhotoUploadStatus("", false); }, 3000);
   } catch (err) {
     console.error(err);
     setPhotoUploadStatus("Delete error: " + (err.message || err), true);
-    alert("Δεν έγινε διαγραφή. Έλεγξε ότι έχεις ενεργοποιήσει DELETE policy στο Supabase.");
+    alert("Δεν έγινε πλήρης διαγραφή. Έλεγξε Vercel URL, Cloudinary API credentials και Supabase DELETE policy.");
   }
 }
 
@@ -1000,5 +1082,26 @@ setInterval(loadSharedPhotos, 30000);
 fetchData();
 setInterval(fetchData, 30000);
 </script>
+
+<script>
+(function(){
+  var btn=document.getElementById('themeToggle');
+  if(!btn) return;
+  function applyTheme(theme){
+    var dark=theme==='dark';
+    document.body.classList.toggle('dark-mode', dark);
+    btn.textContent=dark?'☀️ Light':'🌙 Dark';
+    btn.setAttribute('aria-label', dark?'Switch to light mode':'Switch to dark mode');
+  }
+  var saved=localStorage.getItem('kefaloniaTheme') || 'light';
+  applyTheme(saved);
+  btn.addEventListener('click', function(){
+    var next=document.body.classList.contains('dark-mode')?'light':'dark';
+    localStorage.setItem('kefaloniaTheme', next);
+    applyTheme(next);
+  });
+})();
+</script>
+
 </body>
 </html>
