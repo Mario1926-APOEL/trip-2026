@@ -983,29 +983,44 @@ async function confirmAndDeletePhoto(photo) {
     alert("Δεν μπορώ να διαγράψω αυτή τη φωτογραφία γιατί λείπει το Supabase ID.");
     return;
   }
-  if (!photo.publicId) {
-    alert("Δεν μπορώ να σβήσω από Cloudinary γιατί λείπει το public_id. Θα πρέπει να γίνει re-upload με τη νέα έκδοση.");
-    return;
-  }
 
-  var ok = confirm("Να διαγραφεί αυτή η φωτογραφία από Cloudinary ΚΑΙ από το κοινό gallery για όλους;");
+  var ok = confirm("Να διαγραφεί αυτή η φωτογραφία από το κοινό gallery για όλους και, αν υπάρχει ακόμη, από το Cloudinary;");
   if (!ok) return;
 
-  try {
-    setPhotoUploadStatus("Διαγραφή από Cloudinary...", true);
-    await deletePhotoFromCloudinary(photo.publicId);
+  var cloudinaryDeleted = false;
+  var cloudinaryMessage = "";
 
+  try {
+    if (photo.publicId) {
+      setPhotoUploadStatus("Διαγραφή από Cloudinary...", true);
+      await deletePhotoFromCloudinary(photo.publicId);
+      cloudinaryDeleted = true;
+    } else {
+      cloudinaryMessage = "Δεν υπάρχει public_id για Cloudinary delete.";
+    }
+  } catch (err) {
+    console.warn("Cloudinary delete was not confirmed:", err);
+    cloudinaryMessage = err && err.message ? err.message : "Cloudinary delete failed";
+  }
+
+  try {
     setPhotoUploadStatus("Διαγραφή από Supabase gallery...", true);
     await deletePhotoRecordFromSupabase(photo.id);
 
     uploadedPhotos = uploadedPhotos.filter(function(p) { return String(p.id) !== String(photo.id); });
     renderPhotos(uploadedPhotos);
-    setPhotoUploadStatus("&#10003; Η φωτογραφία διαγράφηκε από Cloudinary και από το κοινό gallery για όλους.", true);
-    setTimeout(function(){ setPhotoUploadStatus("", false); }, 3000);
+
+    if (cloudinaryDeleted) {
+      setPhotoUploadStatus("&#10003; Η φωτογραφία διαγράφηκε από Cloudinary και από το κοινό gallery για όλους.", true);
+    } else {
+      setPhotoUploadStatus("&#10003; Η φωτογραφία διαγράφηκε από το κοινό gallery. Cloudinary: " + cloudinaryMessage, true);
+    }
+
+    setTimeout(function(){ setPhotoUploadStatus("", false); }, 5000);
   } catch (err) {
     console.error(err);
-    setPhotoUploadStatus("Delete error: " + (err.message || err), true);
-    alert("Δεν έγινε πλήρης διαγραφή. Έλεγξε Vercel URL, Cloudinary API credentials και Supabase DELETE policy.");
+    setPhotoUploadStatus("Supabase delete error: " + (err.message || err), true);
+    alert("Δεν έγινε διαγραφή από το κοινό gallery. Έλεγξε το Supabase DELETE policy.");
   }
 }
 
