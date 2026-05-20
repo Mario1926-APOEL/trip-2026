@@ -32,6 +32,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Ar
 .card{background:#fff;border-radius:14px;border:1px solid rgba(0,0,0,.08);box-shadow:0 2px 12px rgba(0,0,0,.06);padding:1rem 1.25rem;margin-bottom:10px;display:flex;align-items:center;gap:14px}
 .card-icon{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
 .icon-flight{background:#e8f0fb}.icon-hotel{background:#fff3e0}.icon-car{background:#fce4ec}
+
+.flight-svg{width:22px;height:22px;display:block;color:#2a5fa5;transform:rotate(-18deg)}
+.upload-actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px}
+.upload-btn.secondary{background:#0f6e56}
+body.dark-mode .flight-svg{color:#8ab4ff}
+
 .card-body{flex:1}
 .card-name{font-size:15px;font-weight:600;color:#1a1a18;margin-bottom:2px}
 .card-detail{font-size:12.5px;color:#7a7870;margin-bottom:4px}
@@ -96,7 +102,8 @@ footer{text-align:center;font-size:12px;color:#7a7870;margin-top:2.5rem}
 .upload-input{display:none}
 .uploaded-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:16px}
 .uploaded-img-wrap{border-radius:12px;overflow:hidden;position:relative;aspect-ratio:4/3;box-shadow:0 2px 8px rgba(0,0,0,.1);background:#e8f0fb}
-.uploaded-img-wrap img{width:100%;height:100%;object-fit:cover}
+.uploaded-img-wrap img,.uploaded-img-wrap video{width:100%;height:100%;object-fit:cover;display:block}
+.video-play-badge{position:absolute;left:8px;top:8px;background:rgba(0,0,0,.62);color:#fff;border-radius:99px;padding:3px 8px;font-size:12px;font-weight:700;pointer-events:none}
 .uploaded-img-author{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.6));color:#fff;font-size:11px;font-weight:600;padding:16px 42px 6px 8px;text-align:center}
 .download-photo-btn{position:absolute;right:8px;bottom:6px;width:28px;height:28px;border-radius:50%;border:none;background:rgba(255,255,255,.92);color:#2a5fa5;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.18)}
 .download-photo-btn:hover{background:#fff;transform:scale(1.04)}
@@ -109,7 +116,8 @@ footer{text-align:center;font-size:12px;color:#7a7870;margin-top:2.5rem}
 .photo-name-bar{background:#fff;border-radius:14px;border:1px solid rgba(0,0,0,.08);box-shadow:0 2px 12px rgba(0,0,0,.06);padding:.9rem 1.25rem;margin-top:16px;display:flex;align-items:center;gap:10px}
 .lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:1000;align-items:center;justify-content:center;flex-direction:column}
 .lightbox.open{display:flex}
-.lightbox img{max-width:95vw;max-height:80vh;border-radius:8px;object-fit:contain}
+.lightbox img,.lightbox video{max-width:95vw;max-height:80vh;border-radius:8px;object-fit:contain;background:#000}
+.lightbox video{display:none}
 .lightbox-close{position:absolute;top:16px;right:16px;background:none;border:none;color:#fff;font-size:28px;cursor:pointer}
 .lightbox-label{color:#fff;font-size:14px;margin-top:12px;font-weight:600}
 .wa-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#25D366;color:#fff;border-radius:14px;padding:14px 20px;box-shadow:0 4px 20px rgba(0,0,0,0.2);display:flex;align-items:center;gap:12px;max-width:340px;width:90%;z-index:999;opacity:0;transition:opacity 0.3s ease;pointer-events:none}
@@ -199,8 +207,8 @@ body.dark-mode .badge-ok{background:#12382d;color:#7ee6c4}
 </div>
 <div class="tab-pane active" id="tab-trip">
   <p class="section-label">Πτήσεις</p>
-  <div class="card"><div class="card-icon icon-flight">&#9992;</div><div class="card-body"><p class="card-name">Λάρνακα &rarr; Αργοστόλι</p><p class="card-detail">17 Ιουλ &bull; 15:45&ndash;21:55 &bull; Aegean Airlines &bull; 1 στάση</p><span class="badge-ok">&#10003; Επιβεβαιωμένο</span></div></div>
-  <div class="card"><div class="card-icon icon-flight">&#9992;</div><div class="card-body"><p class="card-name">Αργοστόλι &rarr; Λάρνακα</p><p class="card-detail">24 Ιουλ &bull; 19:50 &ndash; 25 Ιουλ 00:50 &bull; Sky Express &bull; 1 στάση</p><span class="badge-ok">&#10003; Επιβεβαιωμένο</span></div><div class="card-price">&euro;992.06<small>5 επιβ.</small></div></div>
+  <div class="card"><div class="card-icon icon-flight"><svg class="flight-svg" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg></div><div class="card-body"><p class="card-name">Λάρνακα &rarr; Αργοστόλι</p><p class="card-detail">17 Ιουλ &bull; 15:45&ndash;21:55 &bull; Aegean Airlines &bull; 1 στάση</p><span class="badge-ok">&#10003; Επιβεβαιωμένο</span></div></div>
+  <div class="card"><div class="card-icon icon-flight"><svg class="flight-svg" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg></div><div class="card-body"><p class="card-name">Αργοστόλι &rarr; Λάρνακα</p><p class="card-detail">24 Ιουλ &bull; 19:50 &ndash; 25 Ιουλ 00:50 &bull; Sky Express &bull; 1 στάση</p><span class="badge-ok">&#10003; Επιβεβαιωμένο</span></div><div class="card-price">&euro;992.06<small>5 επιβ.</small></div></div>
   <p class="section-label">Διαμονές</p>
   <div class="card"><div class="card-icon icon-hotel">&#127968;</div><div class="card-body"><p class="card-name">Yasemi &mdash; Αργοστόλι</p><p class="card-detail">17&ndash;21 Ιουλ &bull; 4 νύχτες &bull; &euro;931</p><button class="badge-pending" id="badge-yasemi">&#9201; Εκκρεμεί πληρωμή</button></div></div>
   <div class="card"><div class="card-icon icon-hotel">&#127968;</div><div class="card-body"><p class="card-name">Ithaca's Poem Apartments</p><p class="card-detail">21&ndash;24 Ιουλ &bull; Βαθύ, Ιθάκη &bull; 3 νύχτες &bull; &euro;757.20</p><button class="badge-pending" id="badge-ithaca">&#9201; Εκκρεμεί πληρωμή</button></div></div>
@@ -493,15 +501,19 @@ body.dark-mode .badge-ok{background:#12382d;color:#7ee6c4}
   <!-- UPLOAD AREA -->
   <div class="upload-area" id="uploadArea">
     <div class="upload-icon">&#128247;</div>
-    <div class="upload-text">Πρόσθεσε φωτογραφία από το ταξίδι</div>
-    <div class="upload-sub">Tap για να επιλέξεις από τη συλλογή σου</div>
-    <button class="upload-btn" id="uploadTriggerBtn">&#128247; Επιλογή φωτογραφίας</button>
-    <input type="file" id="photoFileInput" class="upload-input" accept="image/*" multiple/>
+    <div class="upload-text">Πρόσθεσε φωτογραφία ή video από το ταξίδι</div>
+    <div class="upload-sub">Επίλεξε από gallery ή χρησιμοποίησε την κάμερα</div>
+    <div class="upload-actions">
+      <button class="upload-btn" id="uploadTriggerBtn" type="button">&#128247; Επιλογή photo/video</button>
+      <button class="upload-btn secondary" id="cameraTriggerBtn" type="button">&#128248; Άνοιγμα κάμερας</button>
+    </div>
+    <input type="file" id="photoFileInput" class="upload-input" accept="image/*,video/*" multiple/>
+    <input type="file" id="cameraFileInput" class="upload-input" accept="image/*,video/*" capture="environment"/>
   </div>
 
   <div class="upload-status" id="photoUploadStatus"></div>
 
-  <!-- UPLOADED PHOTOS GRID -->
+  <!-- UPLOADED MIXED MEDIA GRID -->
   <div class="uploaded-grid" id="uploadedGrid"></div>
 
 
@@ -511,8 +523,9 @@ body.dark-mode .badge-ok{background:#12382d;color:#7ee6c4}
 <div class="lightbox" id="lightbox">
   <button class="lightbox-close" id="lightboxClose">&#10005;</button>
   <img id="lightboxImg" src="" alt=""/>
+  <video id="lightboxVideo" controls playsinline></video>
   <div class="lightbox-label" id="lightboxLabel"></div>
-  <p style="color:rgba(255,255,255,.6);font-size:12px;margin-top:8px;">Tap για περισσότερες φωτογραφίες &#8599;</p>
+  <p style="color:rgba(255,255,255,.6);font-size:12px;margin-top:8px;">Preview μέσα στο app &bull; Download από το εικονίδιο</p>
 </div>
 <div class="wa-toast" id="waToast">
   <div class="wa-toast-icon">&#128172;</div>
@@ -759,18 +772,22 @@ function openGallery(name, url) {
 
 document.getElementById("lightboxClose").addEventListener("click", function() {
   document.getElementById("lightbox").classList.remove("open");
+  var v = document.getElementById("lightboxVideo"); if (v) v.pause();
 });
 document.getElementById("lightbox").addEventListener("click", function(e) {
-  if (e.target === this) this.classList.remove("open");
+  if (e.target === this) {
+    this.classList.remove("open");
+    var v = document.getElementById("lightboxVideo"); if (v) v.pause();
+  }
 });
 
-// PHOTO UPLOAD WITH CLOUDINARY + SUPABASE - SHARED GALLERY
-// Cloudinary stores the actual image files.
-// Supabase stores the shared photo list so everyone sees the same uploads on GitHub Pages.
+// MIXED MEDIA UPLOAD WITH CLOUDINARY + SUPABASE - SHARED GALLERY
+// Cloudinary stores the actual photo/video files.
+// Supabase stores the shared media list so everyone sees the same uploads on GitHub Pages.
 var CLOUDINARY_CLOUD_NAME = "dwbhoi5hh";
 var CLOUDINARY_UPLOAD_PRESET = "Kefalonia Ithaca";
 var CLOUDINARY_FOLDER = "Kefalonia_Ithaca_2026";
-var CLOUDINARY_UPLOAD_URL = "https://api.cloudinary.com/v1_1/" + CLOUDINARY_CLOUD_NAME + "/image/upload";
+var CLOUDINARY_UPLOAD_URL = "https://api.cloudinary.com/v1_1/" + CLOUDINARY_CLOUD_NAME + "/auto/upload";
 
 var SUPABASE_URL = "https://thecperzyfoaphjthnyf.supabase.co";
 var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRoZWNwZXJ6eWZvYXBoanRobnlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyNzYyNzksImV4cCI6MjA5NDg1MjI3OX0.KciBKdrZK4DH79HUpkJ5EQxTYOW0N3o9s_4EcqIFNeM";
@@ -812,9 +829,27 @@ function clearPhotoGrid() {
   if (grid) grid.innerHTML = "";
 }
 
+function isVideoMedia(photo) {
+  return (photo && photo.mediaType === "video") || /\/video\/upload\//.test((photo && photo.url) || "") || /\.(mp4|mov|webm|m4v)(\?|$)/i.test((photo && photo.url) || "");
+}
+
 function openPhotoLightbox(photo) {
-  document.getElementById("lightboxImg").src = photo.url;
-  document.getElementById("lightboxLabel").textContent = photo.author || "Trip photo";
+  var img = document.getElementById("lightboxImg");
+  var video = document.getElementById("lightboxVideo");
+  if (isVideoMedia(photo)) {
+    img.style.display = "none";
+    img.removeAttribute("src");
+    video.style.display = "block";
+    video.src = photo.url;
+    video.load();
+  } else {
+    video.pause();
+    video.removeAttribute("src");
+    video.style.display = "none";
+    img.style.display = "block";
+    img.src = photo.url;
+  }
+  document.getElementById("lightboxLabel").textContent = photo.author || (isVideoMedia(photo) ? "Trip video" : "Trip photo");
   document.getElementById("lightbox").classList.add("open");
 }
 
@@ -849,11 +884,24 @@ function addPhotoToGrid(photo, insertFirst) {
   var wrap = document.createElement("div");
   wrap.className = "uploaded-img-wrap";
 
-  var img = document.createElement("img");
-  img.src = photo.url;
-  img.alt = "Trip photo uploaded by " + (photo.author || "Guest");
-  img.loading = "lazy";
-  img.addEventListener("click", function() { openPhotoLightbox(photo); });
+  var mediaEl;
+  if (isVideoMedia(photo)) {
+    mediaEl = document.createElement("video");
+    mediaEl.src = photo.url;
+    mediaEl.muted = true;
+    mediaEl.playsInline = true;
+    mediaEl.preload = "metadata";
+    var badge = document.createElement("div");
+    badge.className = "video-play-badge";
+    badge.innerHTML = "&#9654; Video";
+    wrap.appendChild(badge);
+  } else {
+    mediaEl = document.createElement("img");
+    mediaEl.src = photo.url;
+    mediaEl.alt = "Trip photo uploaded by " + (photo.author || "Guest");
+    mediaEl.loading = "lazy";
+  }
+  mediaEl.addEventListener("click", function() { openPhotoLightbox(photo); });
 
   var lbl = document.createElement("div");
   lbl.className = "uploaded-img-author";
@@ -862,27 +910,27 @@ function addPhotoToGrid(photo, insertFirst) {
   var download = document.createElement("button");
   download.className = "download-photo-btn";
   download.type = "button";
-  download.title = "Download photo";
-  download.setAttribute("aria-label", "Download photo");
+  download.title = isVideoMedia(photo) ? "Download video" : "Download photo";
+  download.setAttribute("aria-label", isVideoMedia(photo) ? "Download video" : "Download photo");
   download.innerHTML = "&#8681;";
   download.addEventListener("click", function(e) {
     e.stopPropagation();
     var safeName = (photo.author || "trip").replace(/[^a-z0-9_-]+/gi, "_");
-    downloadPhoto(photo.url, "kefalonia-ithaki-" + safeName + ".jpg");
+    downloadPhoto(photo.url, "kefalonia-ithaki-" + safeName + (isVideoMedia(photo) ? ".mp4" : ".jpg"));
   });
 
   var del = document.createElement("button");
   del.className = "delete-photo-btn";
   del.type = "button";
-  del.title = "Delete photo";
-  del.setAttribute("aria-label", "Delete photo");
+  del.title = isVideoMedia(photo) ? "Delete video" : "Delete photo";
+  del.setAttribute("aria-label", isVideoMedia(photo) ? "Delete video" : "Delete photo");
   del.innerHTML = "&#128465;";
   del.addEventListener("click", function(e) {
     e.stopPropagation();
     confirmAndDeletePhoto(photo);
   });
 
-  wrap.appendChild(img);
+  wrap.appendChild(mediaEl);
   wrap.appendChild(lbl);
   wrap.appendChild(download);
   wrap.appendChild(del);
@@ -894,18 +942,18 @@ function renderPhotos(photos) {
   clearPhotoGrid();
   uploadedPhotos = photos || [];
   if (!uploadedPhotos.length) {
-    setPhotoUploadStatus("Δεν υπάρχουν ακόμη κοινές φωτογραφίες.", true);
+    setPhotoUploadStatus("Δεν υπάρχουν ακόμη κοινές φωτογραφίες ή videos.", true);
     return;
   }
   uploadedPhotos.forEach(function(photo) { addPhotoToGrid(photo, false); });
-  setPhotoUploadStatus("&#10003; Φορτώθηκαν " + uploadedPhotos.length + " κοινές φωτογραφίες.", true);
+  setPhotoUploadStatus("&#10003; Φορτώθηκαν " + uploadedPhotos.length + " κοινά media.", true);
   setTimeout(function(){ setPhotoUploadStatus("", false); }, 2500);
 }
 
 async function loadSharedPhotos() {
   try {
-    setPhotoUploadStatus("Φόρτωση κοινών φωτογραφιών...", true);
-    var response = await fetch(SUPABASE_PHOTOS_ENDPOINT + "?select=id,image_url,public_id,uploader_name,created_at&order=created_at.desc", {
+    setPhotoUploadStatus("Φόρτωση κοινών photos/videos...", true);
+    var response = await fetch(SUPABASE_PHOTOS_ENDPOINT + "?select=id,image_url,public_id,uploader_name,media_type,created_at&order=created_at.desc", {
       method: "GET",
       headers: supabaseHeaders()
     });
@@ -920,13 +968,14 @@ async function loadSharedPhotos() {
         url: row.image_url,
         publicId: row.public_id || "",
         author: row.uploader_name || "Trip photo",
-        uploadedAt: row.created_at || ""
+        uploadedAt: row.created_at || "",
+        mediaType: row.media_type || (row.image_url && row.image_url.indexOf("/video/upload/") !== -1 ? "video" : "image")
       };
     }).filter(function(photo) { return !!photo.url; });
     renderPhotos(photos);
   } catch (err) {
     console.error(err);
-    setPhotoUploadStatus("Δεν φορτώθηκαν οι κοινές φωτογραφίες. Έλεγξε στο Supabase ότι υπάρχουν τα SELECT/INSERT policies στο table <strong>trip_photos</strong>.", true);
+    setPhotoUploadStatus("Δεν φορτώθηκαν οι κοινά media. Έλεγξε στο Supabase ότι υπάρχουν τα SELECT/INSERT policies στο table <strong>trip_photos</strong>.", true);
   }
 }
 
@@ -934,7 +983,8 @@ async function savePhotoRecordToSupabase(photo) {
   var payload = {
     image_url: photo.url,
     public_id: photo.publicId || null,
-    uploader_name: photo.author || "Trip photo"
+    uploader_name: photo.author || "Trip photo",
+    media_type: photo.mediaType || "image"
   };
   var response = await fetch(SUPABASE_PHOTOS_ENDPOINT, {
     method: "POST",
@@ -968,7 +1018,7 @@ async function deletePhotoFromCloudinary(publicId) {
   var response = await fetch(CLOUDINARY_DELETE_API_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ public_id: publicId })
+    body: JSON.stringify({ public_id: publicId, resource_type: arguments[1] || "image" })
   });
   var data = null;
   try { data = await response.json(); } catch(e) {}
@@ -984,7 +1034,7 @@ async function confirmAndDeletePhoto(photo) {
     return;
   }
 
-  var ok = confirm("Να διαγραφεί αυτή η φωτογραφία από το κοινό gallery για όλους και, αν υπάρχει ακόμη, από το Cloudinary;");
+  var ok = confirm("Να διαγραφεί αυτό το αρχείο από το κοινό gallery για όλους και, αν υπάρχει ακόμη, από το Cloudinary;");
   if (!ok) return;
 
   var cloudinaryDeleted = false;
@@ -993,7 +1043,7 @@ async function confirmAndDeletePhoto(photo) {
   try {
     if (photo.publicId) {
       setPhotoUploadStatus("Διαγραφή από Cloudinary...", true);
-      await deletePhotoFromCloudinary(photo.publicId);
+      await deletePhotoFromCloudinary(photo.publicId, photo.mediaType || (isVideoMedia(photo) ? "video" : "image"));
       cloudinaryDeleted = true;
     } else {
       cloudinaryMessage = "Δεν υπάρχει public_id για Cloudinary delete.";
@@ -1011,9 +1061,9 @@ async function confirmAndDeletePhoto(photo) {
     renderPhotos(uploadedPhotos);
 
     if (cloudinaryDeleted) {
-      setPhotoUploadStatus("&#10003; Η φωτογραφία διαγράφηκε από Cloudinary και από το κοινό gallery για όλους.", true);
+      setPhotoUploadStatus("&#10003; Το αρχείο διαγράφηκε από Cloudinary και από το κοινό gallery για όλους.", true);
     } else {
-      setPhotoUploadStatus("&#10003; Η φωτογραφία διαγράφηκε από το κοινό gallery. Cloudinary: " + cloudinaryMessage, true);
+      setPhotoUploadStatus("&#10003; Το αρχείο διαγράφηκε από το κοινό gallery. Cloudinary: " + cloudinaryMessage, true);
     }
 
     setTimeout(function(){ setPhotoUploadStatus("", false); }, 5000);
@@ -1037,21 +1087,29 @@ document.getElementById("uploadTriggerBtn").addEventListener("click", function(e
   document.getElementById("photoFileInput").click();
 });
 
-document.getElementById("uploadArea").addEventListener("click", function() {
+document.getElementById("cameraTriggerBtn").addEventListener("click", function(e) {
+  e.stopPropagation();
+  document.getElementById("cameraFileInput").click();
+});
+
+document.getElementById("uploadArea").addEventListener("click", function(e) {
+  if (e.target.closest("button")) return;
   document.getElementById("photoFileInput").click();
 });
 
-document.getElementById("photoFileInput").addEventListener("change", async function(e) {
+async function handlePhotoFiles(e) {
   if (!photoUserName) { alert("Γράψε πρώτα το όνομά σου!"); e.target.value = ""; return; }
   var files = Array.from(e.target.files || []);
   if (!files.length) return;
 
-  setPhotoUploadStatus("Uploading <strong>" + files.length + "</strong> photo(s)...", true);
+  setPhotoUploadStatus("Uploading <strong>" + files.length + "</strong> file(s)...", true);
   var uploadedCount = 0;
 
   for (var i = 0; i < files.length; i++) {
     var file = files[i];
-    if (!file.type || !file.type.startsWith("image/")) continue;
+    var isVideo = file.type && file.type.startsWith("video/");
+    var isImage = file.type && file.type.startsWith("image/");
+    if (!isImage && !isVideo) continue;
 
     var formData = new FormData();
     formData.append("file", file);
@@ -1070,14 +1128,15 @@ document.getElementById("photoFileInput").addEventListener("change", async funct
         url: cloudinaryData.secure_url,
         author: photoUserName,
         publicId: cloudinaryData.public_id || "",
-        uploadedAt: new Date().toISOString()
+        uploadedAt: new Date().toISOString(),
+        mediaType: cloudinaryData.resource_type || (isVideo ? "video" : "image")
       };
 
       var savedRows = await savePhotoRecordToSupabase(photo);
       if (savedRows && savedRows[0] && savedRows[0].id) photo.id = savedRows[0].id;
       uploadedCount++;
       addPhotoToGrid(photo, true);
-      setPhotoUploadStatus("&#10003; Uploaded <strong>" + uploadedCount + "/" + files.length + "</strong>. Τώρα τη βλέπουν όλοι.", true);
+      setPhotoUploadStatus("&#10003; Uploaded <strong>" + uploadedCount + "/" + files.length + "</strong>. Τώρα το βλέπουν όλοι.", true);
     } catch (err) {
       console.error(err);
       setPhotoUploadStatus("Upload error: " + (err.message || err), true);
@@ -1089,7 +1148,10 @@ document.getElementById("photoFileInput").addEventListener("change", async funct
     showPhotoWaToast(photoUserName, uploadedCount);
   }
   e.target.value = "";
-});
+}
+
+document.getElementById("photoFileInput").addEventListener("change", handlePhotoFiles);
+document.getElementById("cameraFileInput").addEventListener("change", handlePhotoFiles);
 
 loadSharedPhotos();
 setInterval(loadSharedPhotos, 30000);
