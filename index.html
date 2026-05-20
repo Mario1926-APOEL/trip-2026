@@ -573,6 +573,19 @@ document.getElementById("waToastClose").addEventListener("click", function() {
   if (waToastTimeout) clearTimeout(waToastTimeout);
 });
 
+function showPhotoWaToast(author, count) {
+  var photoWord = count === 1 ? "1 φωτογραφία" : count + " φωτογραφίες";
+  document.getElementById("waToastMsg").textContent = author + " ανέβασε " + photoWord + " στο trip gallery";
+  var waText = "📸 Kefalonia & Ithaki 2026\n\n" + author + " ανέβασε " + photoWord + " στο trip gallery!\n\n👉 Δες τις φωτογραφίες εδώ: https://mario1926-apoel.github.io/trip-2026/";
+  document.getElementById("waToastBtn").onclick = function() {
+    window.open("https://wa.me/?text=" + encodeURIComponent(waText), "_blank");
+  };
+  var toast = document.getElementById("waToast");
+  toast.classList.add("show");
+  if (waToastTimeout) clearTimeout(waToastTimeout);
+  waToastTimeout = setTimeout(function(){ toast.classList.remove("show"); }, 7000);
+}
+
 // NOTES
 var API_KEY = "$2a$10$ejCROplsY2SI8jptqg3/..lzQ2e1sdo03oYh669CtXyinoBWeNYBm";
 var BIN_ID = "6a0c2d386610dd3ae86c53ca";
@@ -889,6 +902,7 @@ document.getElementById("photoFileInput").addEventListener("change", async funct
   if (!files.length) return;
 
   setPhotoUploadStatus("Uploading <strong>" + files.length + "</strong> photo(s)...", true);
+  var uploadedCount = 0;
 
   for (var i = 0; i < files.length; i++) {
     var file = files[i];
@@ -915,8 +929,9 @@ document.getElementById("photoFileInput").addEventListener("change", async funct
       };
 
       await savePhotoRecordToSupabase(photo);
+      uploadedCount++;
       addPhotoToGrid(photo, true);
-      setPhotoUploadStatus("&#10003; Uploaded <strong>" + (i + 1) + "/" + files.length + "</strong>. Τώρα τη βλέπουν όλοι.", true);
+      setPhotoUploadStatus("&#10003; Uploaded <strong>" + uploadedCount + "/" + files.length + "</strong>. Τώρα τη βλέπουν όλοι.", true);
     } catch (err) {
       console.error(err);
       setPhotoUploadStatus("Upload error: " + (err.message || err), true);
@@ -924,6 +939,9 @@ document.getElementById("photoFileInput").addEventListener("change", async funct
   }
 
   await loadSharedPhotos();
+  if (uploadedCount > 0) {
+    showPhotoWaToast(photoUserName, uploadedCount);
+  }
   e.target.value = "";
 });
 
