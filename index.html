@@ -109,6 +109,14 @@ footer{text-align:center;font-size:12px;color:#7a7870;margin-top:2.5rem}
 .download-photo-btn:hover{background:#fff;transform:scale(1.04)}
 .delete-photo-btn{position:absolute;right:8px;top:8px;width:28px;height:28px;border-radius:50%;border:none;background:rgba(255,255,255,.92);color:#e53935;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.18)}
 .delete-photo-btn:hover{background:#fff;transform:scale(1.04)}
+.rename-photo-btn{position:absolute;right:44px;top:8px;width:28px;height:28px;border-radius:50%;border:none;background:rgba(255,255,255,.92);color:#2a5fa5;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.rename-photo-btn:hover{background:#fff;transform:scale(1.04)}
+.rename-overlay{position:absolute;inset:0;background:rgba(0,0,0,.7);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;border-radius:12px;padding:12px;}
+.rename-overlay input{width:100%;border:none;border-radius:8px;padding:6px 10px;font-size:13px;font-family:inherit;outline:none;text-align:center;}
+.rename-overlay-btns{display:flex;gap:8px;}
+.rename-overlay-btns button{border:none;border-radius:8px;padding:5px 14px;font-size:12px;font-weight:600;cursor:pointer;}
+.rename-save-btn{background:#2a5fa5;color:#fff;}
+.rename-cancel-btn{background:rgba(255,255,255,.2);color:#fff;}
 .upload-status{display:none;background:#fff;border-radius:12px;border:1px solid rgba(0,0,0,.08);padding:10px 12px;margin-top:12px;font-size:12px;color:#7a7870;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,.05)}
 .upload-status.show{display:block}
 .upload-status strong{color:#2a5fa5}
@@ -910,7 +918,7 @@ function addPhotoToGrid(photo, insertFirst) {
 
   var lbl = document.createElement("div");
   lbl.className = "uploaded-img-author";
-  lbl.textContent = photo.author || "Trip photo";
+  lbl.textContent = (photo.title ? photo.title + " · " : "") + (photo.author || "Trip photo");
 
   var download = document.createElement("button");
   download.className = "download-photo-btn";
@@ -935,12 +943,94 @@ function addPhotoToGrid(photo, insertFirst) {
     confirmAndDeletePhoto(photo);
   });
 
+  // Rename button (pencil icon)
+  var rename = document.createElement("button");
+  rename.className = "rename-photo-btn";
+  rename.type = "button";
+  rename.title = "Μετονομασία";
+  rename.setAttribute("aria-label", "Μετονομασία");
+  rename.innerHTML = "&#9998;";
+  rename.addEventListener("click", function(e) {
+    e.stopPropagation();
+    showRenameOverlay(wrap, photo);
+  });
+
   wrap.appendChild(mediaEl);
   wrap.appendChild(lbl);
   wrap.appendChild(download);
   wrap.appendChild(del);
+  wrap.appendChild(rename);
   if (insertFirst) grid.insertBefore(wrap, grid.firstChild);
   else grid.appendChild(wrap);
+}
+
+async function updatePhotoTitle(photoId, newTitle) {
+  var response = await fetch(SUPABASE_PHOTOS_ENDPOINT + "?id=eq." + encodeURIComponent(photoId), {
+    method: "PATCH",
+    headers: supabaseHeaders({ "Prefer": "return=representation" }),
+    body: JSON.stringify({ title: newTitle })
+  });
+  if (!response.ok) {
+    var txt = await response.text();
+    throw new Error(txt || "Update failed");
+  }
+  return await response.json();
+}
+
+function showRenameOverlay(wrap, photo) {
+  // Remove existing overlay if any
+  var existing = wrap.querySelector(".rename-overlay");
+  if (existing) { wrap.removeChild(existing); return; }
+
+  var overlay = document.createElement("div");
+  overlay.className = "rename-overlay";
+
+  var input = document.createElement("input");
+  input.type = "text";
+  input.placeholder = "Τίτλος φωτογραφίας...";
+  input.value = photo.title || "";
+  input.maxLength = 60;
+
+  var btns = document.createElement("div");
+  btns.className = "rename-overlay-btns";
+
+  var saveBtn = document.createElement("button");
+  saveBtn.className = "rename-save-btn";
+  saveBtn.textContent = "✓ Αποθήκευση";
+  saveBtn.addEventListener("click", async function(e) {
+    e.stopPropagation();
+    var newTitle = input.value.trim();
+    if (!photo.id) { alert("Δεν βρέθηκε ID φωτογραφίας."); return; }
+    try {
+      saveBtn.textContent = "...";
+      saveBtn.disabled = true;
+      await updatePhotoTitle(photo.id, newTitle);
+      photo.title = newTitle;
+      // Update the label
+      var lbl = wrap.querySelector(".uploaded-img-author");
+      if (lbl) lbl.textContent = (newTitle ? newTitle + " · " : "") + (photo.author || "Trip photo");
+      wrap.removeChild(overlay);
+    } catch(err) {
+      alert("Σφάλμα: " + err.message);
+      saveBtn.textContent = "✓ Αποθήκευση";
+      saveBtn.disabled = false;
+    }
+  });
+
+  var cancelBtn = document.createElement("button");
+  cancelBtn.className = "rename-cancel-btn";
+  cancelBtn.textContent = "✕ Άκυρο";
+  cancelBtn.addEventListener("click", function(e) {
+    e.stopPropagation();
+    wrap.removeChild(overlay);
+  });
+
+  btns.appendChild(saveBtn);
+  btns.appendChild(cancelBtn);
+  overlay.appendChild(input);
+  overlay.appendChild(btns);
+  wrap.appendChild(overlay);
+  setTimeout(function(){ input.focus(); input.select(); }, 50);
 }
 
 function renderPhotos(photos) {
