@@ -972,6 +972,10 @@ async function updatePhotoTitle(photoId, newTitle) {
   });
   if (!response.ok) {
     var txt = await response.text();
+    // Common error: title column doesn't exist
+    if (txt && txt.indexOf("title") !== -1) {
+      throw new Error("Η στήλη 'title' δεν υπάρχει στο Supabase. Τρέξε: ALTER TABLE trip_photos ADD COLUMN title text;");
+    }
     throw new Error(txt || "Update failed");
   }
   return await response.json();
@@ -1087,8 +1091,22 @@ async function savePhotoRecordToSupabase(photo) {
     headers: supabaseHeaders({ "Prefer": "return=representation" }),
     body: JSON.stringify(payload)
   });
+  // If failed (e.g. title column doesn't exist yet), retry without title
   if (!response.ok) {
     var txt = await response.text();
+    if (txt && txt.indexOf("title") !== -1) {
+      delete payload.title;
+      var response2 = await fetch(SUPABASE_PHOTOS_ENDPOINT, {
+        method: "POST",
+        headers: supabaseHeaders({ "Prefer": "return=representation" }),
+        body: JSON.stringify(payload)
+      });
+      if (!response2.ok) {
+        var txt2 = await response2.text();
+        throw new Error(txt2 || "Supabase insert failed");
+      }
+      return await response2.json();
+    }
     throw new Error(txt || "Supabase insert failed");
   }
   return await response.json();
