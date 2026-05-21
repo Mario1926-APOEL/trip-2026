@@ -798,7 +798,7 @@ document.getElementById("lightbox").addEventListener("click", function(e) {
 // Cloudinary stores the actual photo/video files.
 // Supabase stores the shared media list so everyone sees the same uploads on GitHub Pages.
 var CLOUDINARY_CLOUD_NAME = "dwbhoi5hh";
-var CLOUDINARY_UPLOAD_PRESET = "kefalonia_ithaca";
+var CLOUDINARY_UPLOAD_PRESET = "Kefalonia Ithaca";
 var CLOUDINARY_FOLDER = "Kefalonia_Ithaca_2026";
 var CLOUDINARY_UPLOAD_URL = "https://api.cloudinary.com/v1_1/" + CLOUDINARY_CLOUD_NAME + "/auto/upload";
 
@@ -1068,7 +1068,8 @@ async function loadSharedPhotos() {
         publicId: row.public_id || "",
         author: row.uploader_name || "Trip photo",
         uploadedAt: row.created_at || "",
-        mediaType: row.media_type || (row.image_url && row.image_url.indexOf("/video/upload/") !== -1 ? "video" : "image")
+        mediaType: row.media_type || (row.image_url && row.image_url.indexOf("/video/upload/") !== -1 ? "video" : "image"),
+        title: row.title || ""
       };
     }).filter(function(photo) { return !!photo.url; });
     renderPhotos(photos);
