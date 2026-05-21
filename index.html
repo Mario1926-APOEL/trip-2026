@@ -111,6 +111,16 @@ footer{text-align:center;font-size:12px;color:#7a7870;margin-top:2.5rem}
 .delete-photo-btn:hover{background:#fff;transform:scale(1.04)}
 .rename-photo-btn{position:absolute;right:44px;top:8px;width:28px;height:28px;border-radius:50%;border:none;background:rgba(255,255,255,.92);color:#2a5fa5;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.18)}
 .rename-photo-btn:hover{background:#fff;transform:scale(1.04)}
+.category-photo-btn{position:absolute;right:80px;top:8px;width:28px;height:28px;border-radius:50%;border:none;background:rgba(255,255,255,.92);color:#0f6e56;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.category-photo-btn:hover{background:#fff;transform:scale(1.04)}
+.category-overlay{position:absolute;inset:0;background:rgba(0,0,0,.82);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border-radius:12px;padding:10px;}
+.category-overlay-title{color:#fff;font-size:12px;font-weight:600;margin-bottom:2px;}
+.category-row{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;}
+.cat-btn{border:none;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:600;cursor:pointer;background:rgba(255,255,255,.15);color:#fff;}
+.cat-btn:hover,.cat-btn.active{background:#2a5fa5;color:#fff;}
+.cat-cancel-btn{border:none;border-radius:8px;padding:4px 12px;font-size:11px;cursor:pointer;background:rgba(255,255,255,.1);color:rgba(255,255,255,.7);margin-top:2px;}
+.album-section-title{font-size:15px;font-weight:700;color:#2a5fa5;margin:18px 0 8px;padding-bottom:6px;border-bottom:2px solid #2a5fa5;grid-column:1/-1;}
+body.dark-mode .album-section-title{color:#7fb0ff;border-bottom-color:#4f8fe8;}
 .rename-overlay{position:absolute;inset:0;background:rgba(0,0,0,.7);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;border-radius:12px;padding:12px;}
 .rename-overlay input{width:100%;border:none;border-radius:8px;padding:6px 10px;font-size:13px;font-family:inherit;outline:none;text-align:center;}
 .rename-overlay-btns{display:flex;gap:8px;}
@@ -943,6 +953,17 @@ function addPhotoToGrid(photo, insertFirst) {
     confirmAndDeletePhoto(photo);
   });
 
+  // Category button (tag icon)
+  var catBtn = document.createElement("button");
+  catBtn.className = "category-photo-btn";
+  catBtn.type = "button";
+  catBtn.title = "Κατηγορία";
+  catBtn.innerHTML = "&#127991;";
+  catBtn.addEventListener("click", function(e) {
+    e.stopPropagation();
+    showCategoryOverlay(wrap, photo);
+  });
+
   // Rename button (pencil icon)
   var rename = document.createElement("button");
   rename.className = "rename-photo-btn";
@@ -960,8 +981,87 @@ function addPhotoToGrid(photo, insertFirst) {
   wrap.appendChild(download);
   wrap.appendChild(del);
   wrap.appendChild(rename);
+  wrap.appendChild(catBtn);
   if (insertFirst) grid.insertBefore(wrap, grid.firstChild);
   else grid.appendChild(wrap);
+}
+
+var CATEGORIES = [
+  { id: "kef-beach",   label: "🌊 Παραλίες",     island: "Κεφαλονιά" },
+  { id: "kef-food",    label: "🍽️ Εστιατόρια",   island: "Κεφαλονιά" },
+  { id: "kef-visit",   label: "📍 Αξιοθέατα",    island: "Κεφαλονιά" },
+  { id: "kef-general", label: "📸 Γενικά",        island: "Κεφαλονιά" },
+  { id: "ith-beach",   label: "🌊 Παραλίες",     island: "Ιθάκη" },
+  { id: "ith-food",    label: "🍽️ Εστιατόρια",   island: "Ιθάκη" },
+  { id: "ith-visit",   label: "📍 Αξιοθέατα",    island: "Ιθάκη" },
+  { id: "ith-general", label: "📸 Γενικά",        island: "Ιθάκη" }
+];
+
+async function updatePhotoCategory(photoId, category) {
+  var response = await fetch(SUPABASE_PHOTOS_ENDPOINT + "?id=eq." + encodeURIComponent(photoId), {
+    method: "PATCH",
+    headers: supabaseHeaders({ "Prefer": "return=representation" }),
+    body: JSON.stringify({ category: category })
+  });
+  if (!response.ok) {
+    var txt = await response.text();
+    throw new Error(txt || "Update failed");
+  }
+  return await response.json();
+}
+
+function showCategoryOverlay(wrap, photo) {
+  var existing = wrap.querySelector(".category-overlay");
+  if (existing) { wrap.removeChild(existing); return; }
+
+  var overlay = document.createElement("div");
+  overlay.className = "category-overlay";
+
+  var title = document.createElement("div");
+  title.className = "category-overlay-title";
+  title.textContent = "Επίλεξε κατηγορία:";
+  overlay.appendChild(title);
+
+  var islands = ["Κεφαλονιά", "Ιθάκη"];
+  islands.forEach(function(island) {
+    var islandLabel = document.createElement("div");
+    islandLabel.style.cssText = "color:rgba(255,255,255,.6);font-size:10px;font-weight:600;text-transform:uppercase;margin-top:4px;";
+    islandLabel.textContent = island;
+    overlay.appendChild(islandLabel);
+
+    var row = document.createElement("div");
+    row.className = "category-row";
+    CATEGORIES.filter(function(c){ return c.island === island; }).forEach(function(cat) {
+      var btn = document.createElement("button");
+      btn.className = "cat-btn" + (photo.category === cat.id ? " active" : "");
+      btn.textContent = cat.label;
+      btn.addEventListener("click", async function(e) {
+        e.stopPropagation();
+        if (!photo.id) { alert("Δεν βρέθηκε ID."); return; }
+        try {
+          var newCat = photo.category === cat.id ? "" : cat.id;
+          await updatePhotoCategory(photo.id, newCat || null);
+          photo.category = newCat;
+          wrap.removeChild(overlay);
+          await loadSharedPhotos();
+        } catch(err) {
+          alert("Σφάλμα: " + err.message);
+        }
+      });
+      row.appendChild(btn);
+    });
+    overlay.appendChild(row);
+  });
+
+  var cancelBtn = document.createElement("button");
+  cancelBtn.className = "cat-cancel-btn";
+  cancelBtn.textContent = "✕ Άκυρο";
+  cancelBtn.addEventListener("click", function(e) {
+    e.stopPropagation();
+    wrap.removeChild(overlay);
+  });
+  overlay.appendChild(cancelBtn);
+  wrap.appendChild(overlay);
 }
 
 async function updatePhotoTitle(photoId, newTitle) {
@@ -1044,7 +1144,34 @@ function renderPhotos(photos) {
     setPhotoUploadStatus("Δεν υπάρχουν ακόμη κοινές φωτογραφίες ή videos.", true);
     return;
   }
-  uploadedPhotos.forEach(function(photo) { addPhotoToGrid(photo, false); });
+
+  var grid = document.getElementById("uploadedGrid");
+  var sections = [
+    { id: "",            label: "📂 Χωρίς κατηγορία" },
+    { id: "kef-beach",   label: "🏝️ Κεφαλονιά — 🌊 Παραλίες" },
+    { id: "kef-food",    label: "🏝️ Κεφαλονιά — 🍽️ Εστιατόρια" },
+    { id: "kef-visit",   label: "🏝️ Κεφαλονιά — 📍 Αξιοθέατα" },
+    { id: "kef-general", label: "🏝️ Κεφαλονιά — 📸 Γενικά" },
+    { id: "ith-beach",   label: "⚓ Ιθάκη — 🌊 Παραλίες" },
+    { id: "ith-food",    label: "⚓ Ιθάκη — 🍽️ Εστιατόρια" },
+    { id: "ith-visit",   label: "⚓ Ιθάκη — 📍 Αξιοθέατα" },
+    { id: "ith-general", label: "⚓ Ιθάκη — 📸 Γενικά" }
+  ];
+
+  sections.forEach(function(section) {
+    var sectionPhotos = uploadedPhotos.filter(function(p) {
+      return (p.category || "") === section.id;
+    });
+    if (!sectionPhotos.length) return;
+
+    var titleEl = document.createElement("div");
+    titleEl.className = "album-section-title";
+    titleEl.textContent = section.label;
+    grid.appendChild(titleEl);
+
+    sectionPhotos.forEach(function(photo) { addPhotoToGrid(photo, false); });
+  });
+
   setPhotoUploadStatus("&#10003; Φορτώθηκαν " + uploadedPhotos.length + " κοινά media.", true);
   setTimeout(function(){ setPhotoUploadStatus("", false); }, 2500);
 }
@@ -1052,7 +1179,7 @@ function renderPhotos(photos) {
 async function loadSharedPhotos() {
   try {
     setPhotoUploadStatus("Φόρτωση κοινών photos/videos...", true);
-    var response = await fetch(SUPABASE_PHOTOS_ENDPOINT + "?select=id,image_url,public_id,uploader_name,media_type,created_at,title&order=created_at.desc", {
+    var response = await fetch(SUPABASE_PHOTOS_ENDPOINT + "?select=id,image_url,public_id,uploader_name,media_type,created_at,title,category&order=created_at.desc", {
       method: "GET",
       headers: supabaseHeaders()
     });
@@ -1069,7 +1196,8 @@ async function loadSharedPhotos() {
         author: row.uploader_name || "Trip photo",
         uploadedAt: row.created_at || "",
         mediaType: row.media_type || (row.image_url && row.image_url.indexOf("/video/upload/") !== -1 ? "video" : "image"),
-        title: row.title || ""
+        title: row.title || "",
+        category: row.category || ""
       };
     }).filter(function(photo) { return !!photo.url; });
     renderPhotos(photos);
@@ -1085,7 +1213,8 @@ async function savePhotoRecordToSupabase(photo) {
     public_id: photo.publicId || null,
     uploader_name: photo.author || "Trip photo",
     media_type: photo.mediaType || "image",
-    title: photo.title || null
+    title: photo.title || null,
+    category: photo.category || null
   };
   var response = await fetch(SUPABASE_PHOTOS_ENDPOINT, {
     method: "POST",
