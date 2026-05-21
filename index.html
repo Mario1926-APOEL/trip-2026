@@ -113,12 +113,13 @@ footer{text-align:center;font-size:12px;color:#7a7870;margin-top:2.5rem}
 .rename-photo-btn:hover{background:#fff;transform:scale(1.04)}
 .category-photo-btn{position:absolute;right:80px;top:8px;width:28px;height:28px;border-radius:50%;border:none;background:rgba(255,255,255,.92);color:#0f6e56;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.18)}
 .category-photo-btn:hover{background:#fff;transform:scale(1.04)}
-.category-overlay{position:absolute;inset:0;background:rgba(0,0,0,.82);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border-radius:12px;padding:10px;}
-.category-overlay-title{color:#fff;font-size:12px;font-weight:600;margin-bottom:2px;}
-.category-row{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;}
-.cat-btn{border:none;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:600;cursor:pointer;background:rgba(255,255,255,.15);color:#fff;}
+.category-overlay{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.88);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:0;padding:20px 16px;overflow-y:auto;}
+.category-overlay-title{color:#fff;font-size:16px;font-weight:700;margin-bottom:12px;text-align:center;}
+.category-island-label{color:rgba(255,255,255,.6);font-size:12px;font-weight:600;text-transform:uppercase;margin:12px 0 6px;width:100%;text-align:left;}
+.category-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-start;width:100%;}
+.cat-btn{border:none;border-radius:12px;padding:12px 18px;font-size:15px;font-weight:600;cursor:pointer;background:rgba(255,255,255,.15);color:#fff;min-height:48px;}
 .cat-btn:hover,.cat-btn.active{background:#2a5fa5;color:#fff;}
-.cat-cancel-btn{border:none;border-radius:8px;padding:4px 12px;font-size:11px;cursor:pointer;background:rgba(255,255,255,.1);color:rgba(255,255,255,.7);margin-top:2px;}
+.cat-cancel-btn{border:none;border-radius:12px;padding:12px 24px;font-size:15px;cursor:pointer;background:rgba(255,255,255,.1);color:rgba(255,255,255,.7);margin-top:16px;min-height:48px;width:100%;}
 .album-section-title{font-size:15px;font-weight:700;color:#2a5fa5;margin:18px 0 8px;padding-bottom:6px;border-bottom:2px solid #2a5fa5;grid-column:1/-1;}
 body.dark-mode .album-section-title{color:#7fb0ff;border-bottom-color:#4f8fe8;}
 .rename-overlay{position:absolute;inset:0;background:rgba(0,0,0,.7);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;border-radius:12px;padding:12px;}
@@ -1025,8 +1026,8 @@ function showCategoryOverlay(wrap, photo) {
   var islands = ["Κεφαλονιά", "Ιθάκη"];
   islands.forEach(function(island) {
     var islandLabel = document.createElement("div");
-    islandLabel.style.cssText = "color:rgba(255,255,255,.6);font-size:10px;font-weight:600;text-transform:uppercase;margin-top:4px;";
-    islandLabel.textContent = island;
+    islandLabel.className = "category-island-label";
+    islandLabel.textContent = island === "Κεφαλονιά" ? "🏝️ Κεφαλονιά" : "⚓ Ιθάκη";
     overlay.appendChild(islandLabel);
 
     var row = document.createElement("div");
@@ -1042,7 +1043,7 @@ function showCategoryOverlay(wrap, photo) {
           var newCat = photo.category === cat.id ? "" : cat.id;
           await updatePhotoCategory(photo.id, newCat || null);
           photo.category = newCat;
-          wrap.removeChild(overlay);
+          if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
           await loadSharedPhotos();
         } catch(err) {
           alert("Σφάλμα: " + err.message);
@@ -1061,7 +1062,7 @@ function showCategoryOverlay(wrap, photo) {
     wrap.removeChild(overlay);
   });
   overlay.appendChild(cancelBtn);
-  wrap.appendChild(overlay);
+  document.body.appendChild(overlay);
 }
 
 async function updatePhotoTitle(photoId, newTitle) {
