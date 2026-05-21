@@ -202,8 +202,8 @@ body.dark-mode .badge-ok{background:#12382d;color:#7ee6c4}
 </div>
 <div class="tab-bar" id="tabBar2">
   <button class="tab-btn" data-tab="maps">&#128205; Maps</button>
-  <button class="tab-btn" data-tab="gallery">&#127956; Gallery</button>
-  <button class="tab-btn" data-tab="photos">&#128247; Φωτογραφίες</button>
+  <button class="tab-btn" data-tab="gallery">&#127956; Google Gallery</button>
+  <button class="tab-btn" data-tab="photos">&#128247; Album</button>
 </div>
 <div class="tab-pane active" id="tab-trip">
   <p class="section-label">Πτήσεις</p>
@@ -511,6 +511,9 @@ body.dark-mode .badge-ok{background:#12382d;color:#7ee6c4}
     <input type="file" id="photoFileInput" class="upload-input" accept="image/*,video/*" multiple/>
     <input type="file" id="photoCameraFileInput" class="upload-input" accept="image/*" capture="environment"/>
     <input type="file" id="videoCameraFileInput" class="upload-input" accept="video/*" capture="environment"/>
+    <div style="margin-top:12px;">
+      <input type="text" id="photoTitleInput" class="add-note-input" placeholder="Τίτλος φωτογραφίας (προαιρετικό)" maxlength="60" style="width:100%;margin-top:4px;"/>
+    </div>
   </div>
 
   <div class="upload-status" id="photoUploadStatus"></div>
@@ -787,7 +790,7 @@ document.getElementById("lightbox").addEventListener("click", function(e) {
 // Cloudinary stores the actual photo/video files.
 // Supabase stores the shared media list so everyone sees the same uploads on GitHub Pages.
 var CLOUDINARY_CLOUD_NAME = "dwbhoi5hh";
-var CLOUDINARY_UPLOAD_PRESET = "kefalonia_ithaca";
+var CLOUDINARY_UPLOAD_PRESET = "Kefalonia Ithaca";
 var CLOUDINARY_FOLDER = "Kefalonia_Ithaca_2026";
 var CLOUDINARY_UPLOAD_URL = "https://api.cloudinary.com/v1_1/" + CLOUDINARY_CLOUD_NAME + "/auto/upload";
 
@@ -955,7 +958,7 @@ function renderPhotos(photos) {
 async function loadSharedPhotos() {
   try {
     setPhotoUploadStatus("Φόρτωση κοινών photos/videos...", true);
-    var response = await fetch(SUPABASE_PHOTOS_ENDPOINT + "?select=id,image_url,public_id,uploader_name,media_type,created_at&order=created_at.desc", {
+    var response = await fetch(SUPABASE_PHOTOS_ENDPOINT + "?select=id,image_url,public_id,uploader_name,media_type,created_at,title&order=created_at.desc", {
       method: "GET",
       headers: supabaseHeaders()
     });
@@ -986,7 +989,8 @@ async function savePhotoRecordToSupabase(photo) {
     image_url: photo.url,
     public_id: photo.publicId || null,
     uploader_name: photo.author || "Trip photo",
-    media_type: photo.mediaType || "image"
+    media_type: photo.mediaType || "image",
+    title: photo.title || null
   };
   var response = await fetch(SUPABASE_PHOTOS_ENDPOINT, {
     method: "POST",
@@ -1167,18 +1171,19 @@ async function handlePhotoFiles(e) {
         throw new Error(cloudinaryData.error && cloudinaryData.error.message ? cloudinaryData.error.message : "Cloudinary upload failed.");
       }
 
+      var photoTitle = document.getElementById("photoTitleInput") ? document.getElementById("photoTitleInput").value.trim() : "";
       var photo = {
         url: cloudinaryData.secure_url,
         author: photoUserName,
         publicId: cloudinaryData.public_id || "",
         uploadedAt: new Date().toISOString(),
-        mediaType: resourceType
+        mediaType: resourceType,
+        title: photoTitle
       };
 
       var savedRows = await savePhotoRecordToSupabase(photo);
       if (savedRows && savedRows[0] && savedRows[0].id) photo.id = savedRows[0].id;
       uploadedCount++;
-      addPhotoToGrid(photo, true);
       setPhotoUploadStatus("&#10003; Uploaded <strong>" + uploadedCount + "/" + files.length + "</strong>. Τώρα το βλέπουν όλοι.", true);
     } catch (err) {
       console.error(err);
@@ -1191,6 +1196,8 @@ async function handlePhotoFiles(e) {
     showPhotoWaToast(photoUserName, uploadedCount);
   }
   e.target.value = "";
+  var titleInput = document.getElementById("photoTitleInput");
+  if (titleInput) titleInput.value = "";
 }
 
 document.getElementById("photoFileInput").addEventListener("change", handlePhotoFiles);
