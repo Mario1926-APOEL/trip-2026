@@ -220,17 +220,6 @@ body.dark-mode .pk-item-lbl.done{color:#555;}
 body.dark-mode .pk-cat-title{color:#7fb0ff;}
 body.dark-mode .pk-cat-btn{background:#1b2026;color:#cbd5e1;border-color:rgba(255,255,255,.14);}
 body.dark-mode .pk-cat-btn.active{background:#4f8fe8;color:#fff;border-color:#4f8fe8;}
-.budget-row{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#fff;border-radius:12px;margin-bottom:8px;border:1px solid rgba(0,0,0,.07);}
-.budget-desc{font-size:14px;font-weight:600;color:#1a1a18;}
-.budget-who{font-size:11px;color:#7a7870;}
-.budget-amt{font-size:15px;font-weight:700;color:#2a5fa5;white-space:nowrap;}
-body.dark-mode .budget-row{background:#1b2026;border-color:rgba(255,255,255,.1);}
-body.dark-mode .budget-desc{color:#f3f4f6;}
-body.dark-mode .budget-who{color:#aaa;}
-body.dark-mode .budget-amt{color:#7fb0ff;}
-body.dark-mode #tab-budget .cd-card{background:#1b2026;border-color:rgba(255,255,255,.1);}
-body.dark-mode #tab-budget .add-note-input,body.dark-mode #tab-budget select{background:#1b2026;color:#f3f4f6;border-color:rgba(255,255,255,.15);}
-body.dark-mode #tab-budget .upload-btn{background:#4f8fe8;}
 body.dark-mode #packingProgress{color:#cbd5e1;}
 
 </style>
@@ -1792,10 +1781,29 @@ function renderBudget(){
   var el=document.getElementById("budgetTotal"); if(el)el.textContent="€"+total.toFixed(2);
   var el2=document.getElementById("budgetPerPerson"); if(el2)el2.textContent="€"+(total/4).toFixed(2);
   var el3=document.getElementById("budgetCount"); if(el3)el3.textContent=budgetItems.length;
-  budgetItems.slice().reverse().forEach(function(item){
-    var row=document.createElement("div"); row.className="budget-row";
-    row.innerHTML="<div style='flex:1;'><div style='font-size:14px;font-weight:600;'>"+item.description+"</div><div style='font-size:11px;color:#7a7870;'>"+( item.paid_by||"Κοινή")+"</div></div><div style='font-size:15px;font-weight:700;color:#2a5fa5;'>€"+parseFloat(item.amount||0).toFixed(2)+"</div><button onclick='deleteBudgetItem("+item.id+")' style='background:none;border:none;color:#ccc;cursor:pointer;font-size:16px;'>🗑</button>";
-    list.appendChild(row);
+  var sections=[
+    {key:"Μάριος",label:"👨 Μάριος"},
+    {key:"Μαρία Ζωή",label:"👩 Μαρία Ζωή"},
+    {key:"Χάρης",label:"👨 Χάρης"},
+    {key:"Στέλλα",label:"👩 Στέλλα"},
+    {key:"Όλοι",label:"💰 Κοινές δαπάνες"}
+  ];
+  sections.forEach(function(sec){
+    var items=budgetItems.filter(function(i){ return (i.paid_by||"Όλοι")===sec.key; });
+    if(!items.length) return;
+    var personTotal=items.reduce(function(s,i){return s+parseFloat(i.amount||0);},0);
+    var title=document.createElement("div"); title.className="budget-section-title";
+    title.textContent=sec.label+" — €"+personTotal.toFixed(2);
+    list.appendChild(title);
+    items.slice().reverse().forEach(function(item){
+      var row=document.createElement("div"); row.className="budget-row";
+      var desc=document.createElement("div"); desc.className="budget-desc"; desc.textContent=item.description;
+      var amt=document.createElement("div"); amt.className="budget-amt"; amt.textContent="€"+parseFloat(item.amount||0).toFixed(2);
+      var del=document.createElement("button"); del.innerHTML="🗑"; del.style.cssText="background:none;border:none;color:#ccc;cursor:pointer;font-size:16px;";
+      del.addEventListener("click",function(){ deleteBudgetItem(item.id); });
+      row.appendChild(desc); row.appendChild(amt); row.appendChild(del);
+      list.appendChild(row);
+    });
   });
 }
 loadBudget();
