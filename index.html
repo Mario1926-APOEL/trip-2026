@@ -139,6 +139,13 @@ body.dark-mode .album-section-title{color:#7fb0ff;border-bottom-color:#4f8fe8;}
 .lightbox video{display:none}
 .lightbox-close{position:absolute;top:16px;right:16px;background:none;border:none;color:#fff;font-size:28px;cursor:pointer}
 .lightbox-label{color:#fff;font-size:14px;margin-top:12px;font-weight:600}
+.lightbox-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.15);border:none;color:#fff;font-size:32px;cursor:pointer;border-radius:50%;width:48px;height:48px;display:flex;align-items:center;justify-content:center;z-index:10;}
+.lightbox-nav:hover{background:rgba(255,255,255,.3)}
+#lightboxPrev{left:8px}#lightboxNext{right:8px}
+.lightbox-reactions{display:flex;gap:8px;margin-top:10px;justify-content:center;flex-wrap:wrap;}
+.lb-reaction-btn{background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.2);border-radius:99px;color:#fff;font-size:16px;padding:6px 14px;cursor:pointer;display:flex;align-items:center;gap:4px;transition:all .15s;}
+.lb-reaction-btn.active{background:rgba(255,255,255,.3);border-color:#fff;}
+.lb-reaction-count{font-size:12px;}
 .wa-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#25D366;color:#fff;border-radius:14px;padding:14px 20px;box-shadow:0 4px 20px rgba(0,0,0,0.2);display:flex;align-items:center;gap:12px;max-width:340px;width:90%;z-index:999;opacity:0;transition:opacity 0.3s ease;pointer-events:none}
 .wa-toast.show{opacity:1;pointer-events:auto}
 .wa-toast-icon{font-size:22px;flex-shrink:0}
@@ -195,6 +202,25 @@ body.dark-mode .claude-note{border-bottom-color:rgba(255,255,255,.08)}
 body.dark-mode .gallery-card{background:#1b2026;box-shadow:0 2px 12px rgba(0,0,0,.35)}
 body.dark-mode .badge-pending{background:#3a2a12;color:#ffcc80}
 body.dark-mode .badge-ok{background:#12382d;color:#7ee6c4}
+.pk-person-tabs{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.pk-person-tabs::-webkit-scrollbar{display:none}
+.pk-person-tab{flex-shrink:0;padding:5px 13px;border-radius:99px;border:1.5px solid rgba(0,0,0,.12);background:#fff;font-size:11px;font-weight:600;cursor:pointer;color:#7a7870;white-space:nowrap;transition:all .18s;}
+.pk-person-tab.active{background:#2a5fa5;color:#fff;border-color:#2a5fa5;}
+.pk-cat-title{font-size:13px;font-weight:700;color:#2a5fa5;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;}
+.pk-item-row{display:flex;align-items:center;gap:10px;padding:8px 12px;background:#fff;border-radius:10px;margin-bottom:6px;border:1px solid rgba(0,0,0,.07);}
+.pk-item-lbl{flex:1;font-size:14px;cursor:pointer;color:#1a1a18;}
+.pk-item-lbl.done{text-decoration:line-through;color:#aaa;}
+.pk-cat-btn{padding:5px 12px;border-radius:99px;border:1.5px solid rgba(0,0,0,.12);background:#fff;font-size:11px;font-weight:600;cursor:pointer;color:#7a7870;white-space:nowrap;}
+.pk-cat-btn.active{background:#2a5fa5;color:#fff;border-color:#2a5fa5;}
+body.dark-mode .pk-person-tab{background:#1b2026;color:#cbd5e1;border-color:rgba(255,255,255,.14);}
+body.dark-mode .pk-person-tab.active{background:#4f8fe8;color:#fff;border-color:#4f8fe8;}
+body.dark-mode .pk-item-row{background:#1b2026;border-color:rgba(255,255,255,.1);}
+body.dark-mode .pk-item-lbl{color:#f3f4f6;}
+body.dark-mode .pk-item-lbl.done{color:#555;}
+body.dark-mode .pk-cat-title{color:#7fb0ff;}
+body.dark-mode .pk-cat-btn{background:#1b2026;color:#cbd5e1;border-color:rgba(255,255,255,.14);}
+body.dark-mode .pk-cat-btn.active{background:#4f8fe8;color:#fff;border-color:#4f8fe8;}
+body.dark-mode #packingProgress{color:#cbd5e1;}
 
 </style>
 </head>
@@ -216,13 +242,18 @@ body.dark-mode .badge-ok{background:#12382d;color:#7ee6c4}
 <div class="tab-bar" id="tabBar">
   <button class="tab-btn active" data-tab="trip">&#128197; Ταξίδι</button>
   <button class="tab-btn" data-tab="notes">&#128221; Notes</button>
-  <button class="tab-btn" data-tab="claude">&#10024; Ιδέες Claude</button>
-  <button class="tab-btn" data-tab="program">&#128336; Πρόγραμμα</button>
+  <button class="tab-btn" data-tab="claude">&#10024; Προτάσεις AI</button>
+  <button class="tab-btn" data-tab="maps">&#128205; Maps</button>
 </div>
 <div class="tab-bar" id="tabBar2">
-  <button class="tab-btn" data-tab="maps">&#128205; Maps</button>
+  <button class="tab-btn" data-tab="program">&#128336; Πρόγραμμα</button>
   <button class="tab-btn" data-tab="gallery">&#127956; Google Gallery</button>
   <button class="tab-btn" data-tab="photos">&#128247; Album</button>
+</div>
+<div class="tab-bar" id="tabBar3">
+  <button class="tab-btn" data-tab="packing">&#129523; Αποσκευές</button>
+  <button class="tab-btn" data-tab="budget">&#128176; Budget</button>
+  <button class="tab-btn" data-tab="weather">&#9925; Καιρός</button>
 </div>
 <div class="tab-pane active" id="tab-trip">
   <p class="section-label">Πτήσεις</p>
@@ -542,14 +573,89 @@ body.dark-mode .badge-ok{background:#12382d;color:#7ee6c4}
 
 
 </div>
+
+<!-- PACKING TAB -->
+<div class="tab-pane" id="tab-packing">
+  <div class="pk-person-tabs">
+    <button class="pk-person-tab active" onclick="switchPackingUser('Μάριος',this)">👨 Μάριος</button>
+    <button class="pk-person-tab" onclick="switchPackingUser('Μαρία Ζωή',this)">👩 Μαρία Ζωή</button>
+  </div>
+  <div class="pk-person-tabs" style="margin-top:-8px;">
+    <button class="pk-person-tab" onclick="switchPackingUser('Χάρης',this)">👨 Χάρης</button>
+    <button class="pk-person-tab" onclick="switchPackingUser('Στέλλα',this)">👩 Στέλλα</button>
+  </div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+    <div id="packingProgress">0 / 0 ετοιμαστεί</div>
+    <button onclick="resetPacking()" style="background:none;border:1px solid rgba(0,0,0,.15);border-radius:8px;padding:4px 10px;font-size:12px;cursor:pointer;color:#7a7870;">↺ Επαναφορά</button>
+  </div>
+  <div id="packingList"></div>
+  <div style="margin-top:14px;">
+    <div style="font-size:12px;color:#7a7870;margin-bottom:6px;font-weight:600;">➕ Προσθήκη σε κατηγορία:</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;" id="packingCatSelect"></div>
+    <div style="display:flex;gap:8px;">
+      <input type="text" id="packingNewItem" placeholder="Νέο αντικείμενο..." maxlength="50" class="add-note-input" style="flex:1;"/>
+      <button onclick="addPackingItem()" class="upload-btn" style="padding:8px 16px;font-size:14px;">+</button>
+    </div>
+  </div>
+</div>
+
+<!-- BUDGET TAB -->
+<div class="tab-pane" id="tab-budget">
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;">
+    <div class="cd-card"><div class="cd-num" id="budgetTotal" style="font-size:20px;">€0</div><div class="cd-label">Σύνολο</div></div>
+    <div class="cd-card"><div class="cd-num" id="budgetPerPerson" style="font-size:20px;">€0</div><div class="cd-label">Ανά άτομο</div></div>
+    <div class="cd-card"><div class="cd-num" id="budgetCount" style="font-size:20px;">0</div><div class="cd-label">Δαπάνες</div></div>
+  </div>
+  <div class="notes-card" style="margin-bottom:12px;">
+    <input type="text" id="budgetDesc" placeholder="Περιγραφή (π.χ. Φέρι Σάμη)" maxlength="60" class="add-note-input" style="width:100%;margin-bottom:8px;"/>
+    <input type="number" id="budgetAmount" placeholder="Ποσό €" min="0" step="0.01" class="add-note-input" style="width:100%;margin-bottom:8px;"/>
+    <select id="budgetWho" class="add-note-input" style="width:100%;margin-bottom:8px;">
+      <option value="Όλοι">💰 Κοινή δαπάνη</option>
+      <option value="Μάριος">👤 Μάριος</option>
+      <option value="Μαρία Ζωή">👤 Μαρία Ζωή</option>
+      <option value="Χάρης">👤 Χάρης</option>
+      <option value="Στέλλα">👤 Στέλλα</option>
+    </select>
+    <button onclick="addBudgetItem()" class="upload-btn" style="width:100%;">+ Προσθήκη δαπάνης</button>
+  </div>
+  <div id="budgetList"></div>
+</div>
+
+<!-- WEATHER TAB -->
+<div class="tab-pane" id="tab-weather">
+  <div style="text-align:center;margin-bottom:14px;font-size:13px;color:#7a7870;">Τρέχων καιρός — Κεφαλονιά &amp; Ιθάκη</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+    <div class="cd-card" style="padding:16px 8px;">
+      <div style="font-size:13px;font-weight:700;color:#2a5fa5;margin-bottom:6px;">🏝️ Αργοστόλι</div>
+      <div id="wIconKef" style="font-size:36px;">⏳</div>
+      <div id="wTempKef" style="font-size:32px;font-weight:700;color:#2a5fa5;">--°</div>
+      <div id="wDescKef" style="font-size:12px;color:#7a7870;margin-top:4px;">Φόρτωση...</div>
+      <div style="display:flex;justify-content:center;gap:10px;margin-top:6px;font-size:11px;color:#7a7870;"><span id="wHumKef">💧 --</span><span id="wWindKef">💨 --</span></div>
+    </div>
+    <div class="cd-card" style="padding:16px 8px;">
+      <div style="font-size:13px;font-weight:700;color:#2a5fa5;margin-bottom:6px;">⚓ Βαθύ, Ιθάκη</div>
+      <div id="wIconIth" style="font-size:36px;">⏳</div>
+      <div id="wTempIth" style="font-size:32px;font-weight:700;color:#2a5fa5;">--°</div>
+      <div id="wDescIth" style="font-size:12px;color:#7a7870;margin-top:4px;">Φόρτωση...</div>
+      <div style="display:flex;justify-content:center;gap:10px;margin-top:6px;font-size:11px;color:#7a7870;"><span id="wHumIth">💧 --</span><span id="wWindIth">💨 --</span></div>
+    </div>
+  </div>
+  <div style="text-align:center;">
+    <button onclick="loadWeather()" class="upload-btn">🔄 Ανανέωση καιρού</button>
+    <div style="font-size:11px;color:#aaa;margin-top:8px;">Δεδομένα: Open-Meteo</div>
+  </div>
+</div>
+
 <footer>Ανανεώνεται κάθε 30 δευτερόλεπτα &bull; Notes αποθηκεύονται online</footer>
 </div>
 <div class="lightbox" id="lightbox">
   <button class="lightbox-close" id="lightboxClose">&#10005;</button>
+  <button class="lightbox-nav" id="lightboxPrev">&#8249;</button>
+  <button class="lightbox-nav" id="lightboxNext">&#8250;</button>
   <img id="lightboxImg" src="" alt=""/>
   <video id="lightboxVideo" controls playsinline></video>
   <div class="lightbox-label" id="lightboxLabel"></div>
-  <p style="color:rgba(255,255,255,.6);font-size:12px;margin-top:8px;">Preview μέσα στο app &bull; Download από το εικονίδιο</p>
+  <div class="lightbox-reactions" id="lightboxReactions"></div>
 </div>
 <div class="wa-toast" id="waToast">
   <div class="wa-toast-icon">&#128172;</div>
@@ -579,6 +685,7 @@ function handleTabClick(e) {
 }
 document.getElementById("tabBar").addEventListener("click", handleTabClick);
 document.getElementById("tabBar2").addEventListener("click", handleTabClick);
+document.getElementById("tabBar3").addEventListener("click", handleTabClick);
 
 // COUNTDOWN
 var departure = new Date("2026-07-17T15:45:00");
@@ -593,10 +700,16 @@ function tick() {
     document.getElementById("pct-label").textContent = "100%";
     return;
   }
-  document.getElementById("cd-d").textContent = Math.floor(diff / 86400000);
-  document.getElementById("cd-h").textContent = Math.floor((diff % 86400000) / 3600000);
-  document.getElementById("cd-m").textContent = Math.floor((diff % 3600000) / 60000);
-  document.getElementById("cd-s").textContent = Math.floor((diff % 60000) / 1000);
+  function animateCd(id, val) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    var v = String(val);
+    if (el.textContent !== v) { el.style.opacity="0"; el.style.transform="translateY(-6px)"; el.textContent = v; setTimeout(function(){ el.style.transition="opacity .2s,transform .2s"; el.style.opacity="1"; el.style.transform="translateY(0)"; setTimeout(function(){ el.style.transition=""; }, 250); },10); }
+  }
+  animateCd("cd-d", Math.floor(diff / 86400000));
+  animateCd("cd-h", Math.floor((diff % 86400000) / 3600000));
+  animateCd("cd-m", Math.floor((diff % 3600000) / 60000));
+  animateCd("cd-s", Math.floor((diff % 60000) / 1000));
   var pct = Math.min(100, Math.round(((totalMs - diff) / totalMs) * 100));
   document.getElementById("prog").style.width = pct + "%";
   document.getElementById("pct-label").textContent = pct + "%";
@@ -857,25 +970,81 @@ function isVideoMedia(photo) {
   return (photo && photo.mediaType === "video") || /\/video\/upload\//.test((photo && photo.url) || "") || /\.(mp4|mov|webm|m4v)(\?|$)/i.test((photo && photo.url) || "");
 }
 
+var _lbIndex = 0;
+var _REACTIONS = ["❤️","😍","🔥","😂","👏","😎"];
+
 function openPhotoLightbox(photo) {
+  var idx = uploadedPhotos.findIndex(function(p){ return p.url === photo.url; });
+  _lbIndex = idx >= 0 ? idx : 0;
+  _showLightboxAt(_lbIndex);
+  document.getElementById("lightbox").classList.add("open");
+}
+
+function _showLightboxAt(idx) {
+  if (!uploadedPhotos.length) return;
+  _lbIndex = ((idx % uploadedPhotos.length) + uploadedPhotos.length) % uploadedPhotos.length;
+  var photo = uploadedPhotos[_lbIndex];
   var img = document.getElementById("lightboxImg");
   var video = document.getElementById("lightboxVideo");
   if (isVideoMedia(photo)) {
-    img.style.display = "none";
-    img.removeAttribute("src");
-    video.style.display = "block";
-    video.src = photo.url;
-    video.load();
+    img.style.display = "none"; img.removeAttribute("src");
+    video.style.display = "block"; video.src = photo.url; video.load();
   } else {
-    video.pause();
-    video.removeAttribute("src");
-    video.style.display = "none";
-    img.style.display = "block";
-    img.src = photo.url;
+    if (video) { video.pause(); video.removeAttribute("src"); video.style.display = "none"; }
+    img.style.display = "block"; img.src = photo.url;
   }
-  document.getElementById("lightboxLabel").textContent = photo.author || (isVideoMedia(photo) ? "Trip video" : "Trip photo");
-  document.getElementById("lightbox").classList.add("open");
+  document.getElementById("lightboxLabel").textContent = (photo.title ? photo.title + " · " : "") + (photo.author || "Trip photo");
+  _renderLbReactions(photo);
 }
+
+function _renderLbReactions(photo) {
+  var box = document.getElementById("lightboxReactions");
+  if (!box) return;
+  box.innerHTML = "";
+  var reactions = {};
+  try { reactions = photo.reactions ? (typeof photo.reactions === "string" ? JSON.parse(photo.reactions) : photo.reactions) : {}; } catch(e) {}
+  var me = photoUserName || "";
+  _REACTIONS.forEach(function(emoji) {
+    var users = reactions[emoji] || [];
+    var btn = document.createElement("button");
+    btn.className = "lb-reaction-btn" + (me && users.indexOf(me) >= 0 ? " active" : "");
+    btn.innerHTML = emoji + " <span class='lb-reaction-count'>" + (users.length || "") + "</span>";
+    btn.addEventListener("click", async function(e) {
+      e.stopPropagation();
+      if (!me) { alert("Γράψε πρώτα το όνομά σου!"); return; }
+      if (!photo.id) return;
+      var i = users.indexOf(me);
+      if (i >= 0) users.splice(i,1); else users.push(me);
+      reactions[emoji] = users;
+      photo.reactions = reactions;
+      btn.className = "lb-reaction-btn" + (users.indexOf(me) >= 0 ? " active" : "");
+      btn.querySelector(".lb-reaction-count").textContent = users.length || "";
+      try {
+        await fetch(SUPABASE_PHOTOS_ENDPOINT + "?id=eq." + encodeURIComponent(photo.id), {
+          method: "PATCH", headers: supabaseHeaders({"Prefer":"return=minimal"}),
+          body: JSON.stringify({reactions: JSON.stringify(reactions)})
+        });
+      } catch(err) {}
+    });
+    box.appendChild(btn);
+  });
+}
+
+// Lightbox nav events
+(function() {
+  var lb = document.getElementById("lightbox");
+  var startX = 0;
+  lb.addEventListener("touchstart", function(e){ startX = e.touches[0].clientX; }, {passive:true});
+  lb.addEventListener("touchend", function(e){ var dx = e.changedTouches[0].clientX - startX; if (Math.abs(dx)>50) _showLightboxAt(_lbIndex+(dx<0?1:-1)); }, {passive:true});
+  document.getElementById("lightboxPrev").addEventListener("click", function(e){ e.stopPropagation(); _showLightboxAt(_lbIndex-1); });
+  document.getElementById("lightboxNext").addEventListener("click", function(e){ e.stopPropagation(); _showLightboxAt(_lbIndex+1); });
+  document.addEventListener("keydown", function(e){
+    if (!lb.classList.contains("open")) return;
+    if (e.key==="ArrowLeft") _showLightboxAt(_lbIndex-1);
+    if (e.key==="ArrowRight") _showLightboxAt(_lbIndex+1);
+    if (e.key==="Escape") { lb.classList.remove("open"); }
+  });
+})();
 
 async function downloadPhoto(url, filename) {
   try {
@@ -1180,7 +1349,7 @@ function renderPhotos(photos) {
 async function loadSharedPhotos() {
   try {
     setPhotoUploadStatus("Φόρτωση κοινών photos/videos...", true);
-    var response = await fetch(SUPABASE_PHOTOS_ENDPOINT + "?select=id,image_url,public_id,uploader_name,media_type,created_at,title,category&order=created_at.desc", {
+    var response = await fetch(SUPABASE_PHOTOS_ENDPOINT + "?select=id,image_url,public_id,uploader_name,media_type,created_at,title,category,reactions&order=created_at.desc", {
       method: "GET",
       headers: supabaseHeaders()
     });
@@ -1198,7 +1367,8 @@ async function loadSharedPhotos() {
         uploadedAt: row.created_at || "",
         mediaType: row.media_type || (row.image_url && row.image_url.indexOf("/video/upload/") !== -1 ? "video" : "image"),
         title: row.title || "",
-        category: row.category || ""
+        category: row.category || "",
+        reactions: row.reactions ? (typeof row.reactions === "string" ? JSON.parse(row.reactions) : row.reactions) : {}
       };
     }).filter(function(photo) { return !!photo.url; });
     renderPhotos(photos);
@@ -1448,6 +1618,199 @@ setInterval(loadSharedPhotos, 30000);
 
 fetchData();
 setInterval(fetchData, 30000);
+
+// ============================================================
+// PACKING LIST
+// ============================================================
+var DEFAULT_PACKING = [
+  {cat:"👕 Ρούχα",items:["T-shirts","Σορτσάκια","Μαγιό","Αθλητικά παπούτσια","Σαγιονάρες","Βραδινά ρούχα","Καπέλο","Γυαλιά ηλίου"]},
+  {cat:"🧴 Περιποίηση",items:["Αντηλιακό SPF50+","After sun","Οδοντόβουρτσα","Σαμπουάν & αφρόλουτρο","Αποσμητικό"]},
+  {cat:"💊 Υγεία",items:["Παυσίπονα","Αντισηπτικό","Εντομοαπωθητικό","Φάρμακα","Πλαστέρ","Προφυλακτικά"]},
+  {cat:"📱 Τεχνολογία",items:["Φορτιστές","Power bank","Ακουστικά","Camera"]},
+  {cat:"📋 Έγγραφα",items:["Ταυτότητα/Διαβατήριο","Άδεια οδήγησης","Ασφάλεια ταξιδιού","Κάρτες πληρωμής","Κρατήσεις"]},
+  {cat:"➕ Άλλα",items:[]}
+];
+var _pkUser = "Μάριος";
+var _pkCat = null;
+var packingData = null;
+
+function pkKey(u){ return "packingData2026_"+(u||_pkUser); }
+
+function loadPackingForUser(u){
+  _pkUser = u || _pkUser;
+  var saved = localStorage.getItem(pkKey(_pkUser));
+  packingData = saved ? JSON.parse(saved) : null;
+  if(!packingData){
+    packingData={};
+    DEFAULT_PACKING.forEach(function(c){ c.items.forEach(function(i){ packingData[c.cat+"||"+i]=false; }); });
+  }
+}
+loadPackingForUser("Μάριος");
+
+function switchPackingUser(user, btn){
+  _pkUser = user;
+  document.querySelectorAll(".pk-person-tab").forEach(function(b){ b.classList.remove("active"); });
+  if(btn) btn.classList.add("active");
+  loadPackingForUser(user);
+  _pkCat = null;
+  renderPackingList();
+}
+
+function savePacking(){ localStorage.setItem(pkKey(_pkUser), JSON.stringify(packingData)); }
+
+function getAllCats(){
+  var cats = [];
+  DEFAULT_PACKING.forEach(function(c){ cats.push(c.cat); });
+  Object.keys(packingData).forEach(function(key){
+    var cat = key.split("||")[0];
+    if(cats.indexOf(cat) < 0) cats.push(cat);
+  });
+  if(cats.indexOf("➕ Άλλα") < 0) cats.push("➕ Άλλα");
+  return cats;
+}
+
+function renderCatSelect(){
+  var box = document.getElementById("packingCatSelect"); if(!box) return;
+  box.innerHTML = "";
+  var cats = getAllCats();
+  if(!_pkCat) _pkCat = cats[0];
+  cats.forEach(function(cat){
+    var btn = document.createElement("button");
+    btn.className = "pk-cat-btn" + (cat === _pkCat ? " active" : "");
+    btn.textContent = cat;
+    btn.addEventListener("click", function(){ _pkCat = cat; renderCatSelect(); });
+    box.appendChild(btn);
+  });
+}
+
+function renderPackingList(){
+  var container = document.getElementById("packingList"); if(!container) return;
+  container.innerHTML = "";
+  var cats = {};
+  getAllCats().forEach(function(c){ cats[c] = []; });
+  Object.keys(packingData).forEach(function(key){
+    var p = key.split("||"), cat = p[0], item = p[1];
+    if(!cats[cat]) cats[cat] = [];
+    cats[cat].push({key:key, item:item, checked:packingData[key]});
+  });
+  DEFAULT_PACKING.forEach(function(c){
+    c.items.forEach(function(item){
+      var key = c.cat+"||"+item;
+      if(packingData[key] === undefined){
+        packingData[key] = false;
+        if(!cats[c.cat]) cats[c.cat] = [];
+        cats[c.cat].push({key:key, item:item, checked:false});
+      }
+    });
+  });
+  Object.keys(cats).forEach(function(cat){
+    var items = cats[cat]; if(!items.length) return;
+    var sec = document.createElement("div"); sec.style.marginBottom = "14px";
+    var title = document.createElement("div"); title.className = "pk-cat-title"; title.textContent = cat;
+    sec.appendChild(title);
+    items.forEach(function(entry){
+      var row = document.createElement("div"); row.className = "pk-item-row";
+      var cb = document.createElement("input"); cb.type = "checkbox"; cb.checked = entry.checked;
+      cb.style.cssText = "width:18px;height:18px;accent-color:#2a5fa5;cursor:pointer;flex-shrink:0;";
+      var lbl = document.createElement("label"); lbl.className = "pk-item-lbl"+(entry.checked?" done":""); lbl.textContent = entry.item;
+      cb.addEventListener("change", function(){
+        packingData[entry.key] = cb.checked; savePacking();
+        lbl.className = "pk-item-lbl"+(cb.checked?" done":""); updatePackingProgress();
+      });
+      var del = document.createElement("button"); del.textContent = "✕";
+      del.style.cssText = "background:none;border:none;color:#ccc;cursor:pointer;font-size:14px;padding:0 4px;";
+      del.addEventListener("click", function(){ delete packingData[entry.key]; savePacking(); renderPackingList(); });
+      row.appendChild(cb); row.appendChild(lbl); row.appendChild(del); sec.appendChild(row);
+    });
+    container.appendChild(sec);
+  });
+  updatePackingProgress();
+  renderCatSelect();
+}
+
+function updatePackingProgress(){
+  var total = Object.keys(packingData).length, done = Object.values(packingData).filter(Boolean).length;
+  var el = document.getElementById("packingProgress"); if(el) el.textContent = done+" / "+total+" ετοιμαστεί";
+}
+
+function addPackingItem(){
+  var input = document.getElementById("packingNewItem"), val = input.value.trim(); if(!val) return;
+  var cat = _pkCat || "➕ Άλλα";
+  packingData[cat+"||"+val] = false; savePacking(); input.value = ""; renderPackingList();
+}
+
+function resetPacking(){
+  if(!confirm("Να επαναφερθεί η λίστα για "+_pkUser+";")) return;
+  packingData = {};
+  DEFAULT_PACKING.forEach(function(c){ c.items.forEach(function(i){ packingData[c.cat+"||"+i]=false; }); });
+  savePacking(); renderPackingList();
+}
+var _pkInput = document.getElementById("packingNewItem");
+if(_pkInput) _pkInput.addEventListener("keydown", function(e){ if(e.key==="Enter") addPackingItem(); });
+renderPackingList();
+
+// ============================================================
+// BUDGET TRACKER
+// ============================================================
+var SUPABASE_BUDGET_ENDPOINT = SUPABASE_URL + "/rest/v1/trip_budget";
+var budgetItems = [];
+async function loadBudget(){
+  try {
+    var r=await fetch(SUPABASE_BUDGET_ENDPOINT+"?select=*&order=created_at.asc",{headers:supabaseHeaders()});
+    if(r.ok){ budgetItems=await r.json(); renderBudget(); }
+  } catch(e){}
+}
+async function addBudgetItem(){
+  var desc=document.getElementById("budgetDesc").value.trim();
+  var amount=parseFloat(document.getElementById("budgetAmount").value);
+  var who=document.getElementById("budgetWho").value;
+  if(!desc||!amount||amount<=0){alert("Συμπλήρωσε περιγραφή και ποσό!");return;}
+  try {
+    var r=await fetch(SUPABASE_BUDGET_ENDPOINT,{method:"POST",headers:supabaseHeaders({"Prefer":"return=representation"}),body:JSON.stringify({description:desc,amount:amount,paid_by:who})});
+    if(r.ok){ var rows=await r.json(); budgetItems.push(rows[0]||{}); document.getElementById("budgetDesc").value=""; document.getElementById("budgetAmount").value=""; renderBudget(); }
+    else { var txt=await r.text(); alert("Σφάλμα: "+txt); }
+  } catch(e){ alert("Σφάλμα σύνδεσης"); }
+}
+async function deleteBudgetItem(id){
+  try { await fetch(SUPABASE_BUDGET_ENDPOINT+"?id=eq."+id,{method:"DELETE",headers:supabaseHeaders()}); budgetItems=budgetItems.filter(function(i){return i.id!==id;}); renderBudget(); } catch(e){}
+}
+function renderBudget(){
+  var list=document.getElementById("budgetList"); if(!list)return;
+  list.innerHTML="";
+  var total=budgetItems.reduce(function(s,i){return s+parseFloat(i.amount||0);},0);
+  var el=document.getElementById("budgetTotal"); if(el)el.textContent="€"+total.toFixed(2);
+  var el2=document.getElementById("budgetPerPerson"); if(el2)el2.textContent="€"+(total/4).toFixed(2);
+  var el3=document.getElementById("budgetCount"); if(el3)el3.textContent=budgetItems.length;
+  budgetItems.slice().reverse().forEach(function(item){
+    var row=document.createElement("div"); row.style.cssText="display:flex;align-items:center;gap:10px;padding:10px 14px;background:#fff;border-radius:12px;margin-bottom:8px;border:1px solid rgba(0,0,0,.07);";
+    row.innerHTML="<div style='flex:1;'><div style='font-size:14px;font-weight:600;'>"+item.description+"</div><div style='font-size:11px;color:#7a7870;'>"+( item.paid_by||"Κοινή")+"</div></div><div style='font-size:15px;font-weight:700;color:#2a5fa5;'>€"+parseFloat(item.amount||0).toFixed(2)+"</div><button onclick='deleteBudgetItem("+item.id+")' style='background:none;border:none;color:#ccc;cursor:pointer;font-size:16px;'>🗑</button>";
+    list.appendChild(row);
+  });
+}
+loadBudget();
+
+// ============================================================
+// WEATHER
+// ============================================================
+async function loadWeather(){
+  var locs=[{id:"Kef",lat:38.1753,lon:20.4914},{id:"Ith",lat:38.3667,lon:20.7167}];
+  for(var i=0;i<locs.length;i++){
+    var loc=locs[i];
+    try {
+      var r=await fetch("https://api.open-meteo.com/v1/forecast?latitude="+loc.lat+"&longitude="+loc.lon+"&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&timezone=Europe%2FAthens");
+      var data=await r.json(), cur=data.current;
+      var setEl=function(id,txt){var e=document.getElementById(id);if(e)e.textContent=txt;};
+      setEl("wIcon"+loc.id,weatherEmoji(cur.weather_code));
+      setEl("wTemp"+loc.id,Math.round(cur.temperature_2m)+"°C");
+      setEl("wDesc"+loc.id,weatherDesc(cur.weather_code));
+      setEl("wHum"+loc.id,"💧 "+cur.relative_humidity_2m+"%");
+      setEl("wWind"+loc.id,"💨 "+Math.round(cur.wind_speed_10m)+" km/h");
+    } catch(e){ document.getElementById("wDesc"+loc.id)&&(document.getElementById("wDesc"+loc.id).textContent="Αδύνατη φόρτωση"); }
+  }
+}
+function weatherEmoji(c){ if(c===0)return"☀️";if(c<=2)return"🌤️";if(c<=3)return"☁️";if(c<=49)return"🌫️";if(c<=59)return"🌦️";if(c<=69)return"🌧️";if(c<=79)return"❄️";if(c<=82)return"🌧️";if(c<=99)return"⛈️";return"🌡️"; }
+function weatherDesc(c){ if(c===0)return"Αίθριος";if(c<=2)return"Λίγα σύννεφα";if(c<=3)return"Συννεφιά";if(c<=49)return"Ομίχλη";if(c<=59)return"Ψιλόβροχο";if(c<=69)return"Βροχή";if(c<=79)return"Χιόνι";if(c<=99)return"Καταιγίδα";return"Άγνωστο"; }
+loadWeather();
 </script>
 
 <script>
