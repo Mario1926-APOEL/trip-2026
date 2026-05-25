@@ -466,7 +466,7 @@ body.dark-mode .tab-btn.active{
       <div class="priority-head">
         <div>
           <div class="priority-title">Booking Priority</div>
-          <div class="priority-sub">Βάλε εσύ τη σειρά για το τι πρέπει να κλειστεί πρώτο. Η λίστα αποθηκεύεται στη συσκευή σου.</div>
+          <div class="priority-sub">Βάλε εσύ τη σειρά για το τι πρέπει να κλειστεί πρώτο. Η λίστα συγχρονίζεται σε κινητό και PC.</div>
         </div>
       </div>
       <div class="priority-add">
@@ -2127,6 +2127,7 @@ loadWeather();
   if(!input||!level||!addBtn||!list) return;
 
   var storageKey='kefaloniaBookingPriorities';
+  var sharedKey='bookingPriorities';
   var defaultItems=[
     {text:'Ferry Σάμη ↔ Βαθύ', level:'high'},
     {text:'Ενοικίαση αυτοκινήτου', level:'high'},
@@ -2135,15 +2136,62 @@ loadWeather();
     {text:'Top restaurants για κράτηση', level:'low'}
   ];
 
-  function load(){
+  var items=[];
+
+  function setPriorityHint(msg){
+    var hint=document.querySelector('#bookingPriorityBoard .priority-hint');
+    if(hint) hint.textContent=msg;
+  }
+
+  function loadLocal(){
     try{
       var saved=JSON.parse(localStorage.getItem(storageKey)||'null');
-      return Array.isArray(saved)?saved:defaultItems;
-    }catch(e){ return defaultItems; }
+      return Array.isArray(saved)?saved:null;
+    }catch(e){ return null; }
   }
-  var items=load();
 
-  function save(){ localStorage.setItem(storageKey, JSON.stringify(items)); updateNextBigStep(); updatePendingTile(); }
+  async function loadShared(){
+    setPriorityHint('Συγχρονισμός priority list...');
+    try{
+      var r=await fetch('https://api.jsonbin.io/v3/b/' + BIN_ID + '/latest', { headers: { 'X-Master-Key': API_KEY } });
+      var data=await r.json();
+      var rec=data.record || {};
+      if(Array.isArray(rec[sharedKey])){
+        items=rec[sharedKey];
+      }else{
+        items=loadLocal() || defaultItems;
+        await saveShared(false);
+      }
+      localStorage.setItem(storageKey, JSON.stringify(items));
+      render();
+      setPriorityHint('✓ Shared priority list: συγχρονίζεται σε κινητό και PC. Χρησιμοποίησε ↑ ↓ για αλλαγή σειράς.');
+    }catch(e){
+      items=loadLocal() || defaultItems;
+      render();
+      setPriorityHint('⚠ Offline mode: η λίστα αποθηκεύεται προσωρινά μόνο σε αυτή τη συσκευή.');
+    }
+  }
+
+  async function saveShared(showStatus){
+    if(showStatus!==false) setPriorityHint('Αποθήκευση priority list...');
+    localStorage.setItem(storageKey, JSON.stringify(items));
+    try{
+      var latest=await fetch('https://api.jsonbin.io/v3/b/' + BIN_ID + '/latest', { headers: { 'X-Master-Key': API_KEY } });
+      var data=await latest.json();
+      var rec=data.record || {};
+      rec[sharedKey]=items;
+      await fetch('https://api.jsonbin.io/v3/b/' + BIN_ID, {
+        method:'PUT',
+        headers:{ 'Content-Type':'application/json', 'X-Master-Key': API_KEY },
+        body:JSON.stringify(rec)
+      });
+      setPriorityHint('✓ Shared priority list: συγχρονίζεται σε κινητό και PC. Χρησιμοποίησε ↑ ↓ για αλλαγή σειράς.');
+    }catch(e){
+      setPriorityHint('⚠ Δεν έγινε online sync. Έμεινε προσωρινά αποθηκευμένο στη συσκευή.');
+    }
+  }
+
+  function save(){ updateNextBigStep(); updatePendingTile(); saveShared(true); }
 
   function updateNextBigStep(){
     var valueEl=document.getElementById('nextBigStepValue');
@@ -2245,7 +2293,7 @@ loadWeather();
     render();
   });
 
-  render();
+  loadShared();
 })();
 
 </script>
