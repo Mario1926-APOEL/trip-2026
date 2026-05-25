@@ -966,7 +966,26 @@ tick();
 setInterval(tick, 1000);
 
 // HOTEL PAYMENT
-var hotelStatus = JSON.parse(localStorage.getItem("hotelStatus") || '{"yasemi":false,"ithaca":false}');
+// Shared online state uses the same JSONBin as Notes so everyone sees the same data.
+if (typeof API_KEY === "undefined") var API_KEY = "$2a$10$ejCROplsY2SI8jptqg3/..lzQ2e1sdo03oYh669CtXyinoBWeNYBm";
+if (typeof BIN_ID === "undefined") var BIN_ID = "6a0c2d386610dd3ae86c53ca";
+var hotelStatus = {yasemi:false, ithaca:false};
+
+async function getSharedRecord(){
+  var r = await fetch("https://api.jsonbin.io/v3/b/" + BIN_ID + "/latest", { headers: { "X-Master-Key": API_KEY } });
+  if(!r.ok) throw new Error("JSONBin load failed");
+  var data = await r.json();
+  return data.record || {};
+}
+async function putSharedRecord(rec){
+  var r = await fetch("https://api.jsonbin.io/v3/b/" + BIN_ID, {
+    method:"PUT",
+    headers:{ "Content-Type":"application/json", "X-Master-Key": API_KEY },
+    body:JSON.stringify(rec)
+  });
+  if(!r.ok) throw new Error("JSONBin save failed");
+}
+
 function applyHotelStatus() {
   ["yasemi","ithaca"].forEach(function(h) {
     var btn = document.getElementById("badge-" + h);
@@ -996,16 +1015,31 @@ function updateAccommodationTile(){
     noteEl.textContent="Εκκρεμεί πληρωμή για Yasemi + Ithaca's Poem Apartments · €1,688.20.";
   }
 }
-function confirmPayment(hotel) {
+async function loadHotelStatusShared(){
+  try{
+    var rec = await getSharedRecord();
+    if(rec.hotelStatus && typeof rec.hotelStatus === "object") hotelStatus = rec.hotelStatus;
+    applyHotelStatus();
+  }catch(e){
+    updateAccommodationTile();
+  }
+}
+async function saveHotelStatusShared(){
+  var rec = await getSharedRecord();
+  rec.hotelStatus = hotelStatus;
+  await putSharedRecord(rec);
+}
+async function confirmPayment(hotel) {
   if (confirm("\u0395\u03c0\u03b9\u03b2\u03b5\u03b2\u03b1\u03af\u03c9\u03c3\u03b7 \u03c0\u03bb\u03b7\u03c1\u03c9\u03bc\u03ae\u03c2;")) {
     hotelStatus[hotel] = true;
-    localStorage.setItem("hotelStatus", JSON.stringify(hotelStatus));
     applyHotelStatus();
+    try{ await saveHotelStatusShared(); }
+    catch(e){ alert("Δεν αποθηκεύτηκε online. Έλεγξε internet / GitHub Pages σύνδεση."); }
   }
 }
 document.getElementById("badge-yasemi").addEventListener("click", function(){ confirmPayment("yasemi"); });
 document.getElementById("badge-ithaca").addEventListener("click", function(){ confirmPayment("ithaca"); });
-applyHotelStatus();
+loadHotelStatusShared();
 
 // WHATSAPP TOAST
 var catLabels = {
@@ -1905,14 +1939,22 @@ var _pkCat = null;
 var packingData = null;
 
 function pkKey(u){ return "packingData2026_"+(u||_pkUser); }
+function defaultPackingData(){
+  var obj = {};
+  DEFAULT_PACKING.forEach(function(c){ c.items.forEach(function(i){ obj[c.cat+"||"+i]=false; }); });
+  return obj;
+}
 
-function loadPackingForUser(u){
+async function loadPackingForUser(u){
   _pkUser = u || _pkUser;
-  var saved = localStorage.getItem(pkKey(_pkUser));
-  packingData = saved ? JSON.parse(saved) : null;
-  if(!packingData){
-    packingData={};
-    DEFAULT_PACKING.forEach(function(c){ c.items.forEach(function(i){ packingData[c.cat+"||"+i]=false; }); });
+  try{
+    var rec = await getSharedRecord();
+    if(!rec.packingData2026) rec.packingData2026 = {};
+    packingData = rec.packingData2026[_pkUser] || defaultPackingData();
+    renderPackingList();
+  }catch(e){
+    packingData = defaultPackingData();
+    renderPackingList();
   }
 }
 loadPackingForUser("Marios");
@@ -1921,12 +1963,20 @@ function switchPackingUser(user, btn){
   _pkUser = user;
   document.querySelectorAll(".pk-person-tab").forEach(function(b){ b.classList.remove("active"); });
   if(btn) btn.classList.add("active");
-  loadPackingForUser(user);
   _pkCat = null;
-  renderPackingList();
+  loadPackingForUser(user);
 }
 
-function savePacking(){ localStorage.setItem(pkKey(_pkUser), JSON.stringify(packingData)); }
+async function savePacking(){
+  try{
+    var rec = await getSharedRecord();
+    if(!rec.packingData2026) rec.packingData2026 = {};
+    rec.packingData2026[_pkUser] = packingData;
+    await putSharedRecord(rec);
+  }catch(e){
+    alert("Δεν αποθηκεύτηκε online. Έλεγξε internet / GitHub Pages σύνδεση.");
+  }
+}
 
 function getAllCats(){
   var cats = [];
@@ -1955,6 +2005,7 @@ function renderCatSelect(){
 
 function renderPackingList(){
   var container = document.getElementById("packingList"); if(!container) return;
+  if(!packingData) packingData = defaultPackingData();
   container.innerHTML = "";
   var cats = {};
   getAllCats().forEach(function(c){ cats[c] = []; });
@@ -2126,7 +2177,6 @@ loadWeather();
   var list=document.getElementById('priorityList');
   if(!input||!level||!addBtn||!list) return;
 
-  var storageKey='kefaloniaBookingPriorities';
   var sharedKey='bookingPriorities';
   var defaultItems=[
     {text:'Ferry Σάμη ↔ Βαθύ', level:'high'},
@@ -2143,13 +2193,6 @@ loadWeather();
     if(hint) hint.textContent=msg;
   }
 
-  function loadLocal(){
-    try{
-      var saved=JSON.parse(localStorage.getItem(storageKey)||'null');
-      return Array.isArray(saved)?saved:null;
-    }catch(e){ return null; }
-  }
-
   async function loadShared(){
     setPriorityHint('Συγχρονισμός priority list...');
     try{
@@ -2159,22 +2202,20 @@ loadWeather();
       if(Array.isArray(rec[sharedKey])){
         items=rec[sharedKey];
       }else{
-        items=loadLocal() || defaultItems;
+        items=defaultItems;
         await saveShared(false);
       }
-      localStorage.setItem(storageKey, JSON.stringify(items));
       render();
-      setPriorityHint('✓ Shared priority list: συγχρονίζεται σε κινητό και PC. Χρησιμοποίησε ↑ ↓ για αλλαγή σειράς.');
+      setPriorityHint('✓ Online mode: συγχρονίζεται σε κινητό και PC. Χρησιμοποίησε ↑ ↓ για αλλαγή σειράς.');
     }catch(e){
-      items=loadLocal() || defaultItems;
+      items=defaultItems;
       render();
-      setPriorityHint('⚠ Offline mode: η λίστα αποθηκεύεται προσωρινά μόνο σε αυτή τη συσκευή.');
+      setPriorityHint('⚠ Δεν φορτώθηκε online. Έλεγξε internet / JSONBin σύνδεση.');
     }
   }
 
   async function saveShared(showStatus){
     if(showStatus!==false) setPriorityHint('Αποθήκευση priority list...');
-    localStorage.setItem(storageKey, JSON.stringify(items));
     try{
       var latest=await fetch('https://api.jsonbin.io/v3/b/' + BIN_ID + '/latest', { headers: { 'X-Master-Key': API_KEY } });
       var data=await latest.json();
@@ -2185,9 +2226,9 @@ loadWeather();
         headers:{ 'Content-Type':'application/json', 'X-Master-Key': API_KEY },
         body:JSON.stringify(rec)
       });
-      setPriorityHint('✓ Shared priority list: συγχρονίζεται σε κινητό και PC. Χρησιμοποίησε ↑ ↓ για αλλαγή σειράς.');
+      setPriorityHint('✓ Online mode: συγχρονίζεται σε κινητό και PC. Χρησιμοποίησε ↑ ↓ για αλλαγή σειράς.');
     }catch(e){
-      setPriorityHint('⚠ Δεν έγινε online sync. Έμεινε προσωρινά αποθηκευμένο στη συσκευή.');
+      setPriorityHint('⚠ Δεν έγινε online sync. Έλεγξε internet / JSONBin σύνδεση.');
     }
   }
 
