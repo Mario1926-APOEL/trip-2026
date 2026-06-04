@@ -1083,11 +1083,14 @@ async function saveHotelStatusShared(){
   await putSharedRecord(rec);
 }
 async function confirmPayment(hotel) {
-  if (confirm("\u0395\u03c0\u03b9\u03b2\u03b5\u03b2\u03b1\u03af\u03c9\u03c3\u03b7 \u03c0\u03bb\u03b7\u03c1\u03c9\u03bc\u03ae\u03c2;")) {
+  if (confirm("Επιβεβαίωση πληρωμής;")) {
     hotelStatus[hotel] = true;
     applyHotelStatus();
     try{ await saveHotelStatusShared(); }
     catch(e){ alert("Δεν αποθηκεύτηκε online. Έλεγξε internet / GitHub Pages σύνδεση."); }
+    // Mark as paid in budget seed (bump flag so seed re-runs and updates)
+    localStorage.removeItem('kef_budget_seeded_v2');
+    if(typeof seedFixedBudgetEntries === 'function') seedFixedBudgetEntries();
   }
 }
 document.getElementById("badge-yasemi").addEventListener("click", function(){ confirmPayment("yasemi"); });
@@ -2145,6 +2148,17 @@ async function addBudgetItem(){
     else { var txt=await r.text(); alert("Σφάλμα: "+txt); }
   } catch(e){ alert("Σφάλμα σύνδεσης"); }
 }
+async function postBudgetEntry(description, amount, paid_by){
+  if(!description || !amount || amount <= 0) return;
+  try {
+    var r = await fetch(SUPABASE_BUDGET_ENDPOINT, {
+      method: 'POST',
+      headers: supabaseHeaders({'Prefer':'return=representation'}),
+      body: JSON.stringify({description: description, amount: amount, paid_by: paid_by || 'Όλοι'})
+    });
+    if(r.ok){ var rows = await r.json(); budgetItems.push(rows[0]||{}); renderBudget(); }
+  } catch(e){}
+}
 async function deleteBudgetItem(id){
   try { await fetch(SUPABASE_BUDGET_ENDPOINT+"?id=eq."+id,{method:"DELETE",headers:supabaseHeaders()}); budgetItems=budgetItems.filter(function(i){return i.id!==id;}); renderBudget(); } catch(e){}
 }
@@ -2564,7 +2578,7 @@ loadWeather();
   }
 
   // Add button
-  document.addEventListener('DOMContentLoaded', function(){
+  function initFerry(){
     var addBtn = document.getElementById('ferryAddBtn');
     if(!addBtn) return;
     addBtn.addEventListener('click', function(){
@@ -2593,11 +2607,7 @@ loadWeather();
       if(!isNaN(costNum) && costNum > 0){
         var budgetDesc = routeStr;
         if(dateStr) budgetDesc += ' · ' + dateStr;
-        fetch(SUPABASE_BUDGET_ENDPOINT, {
-          method: 'POST',
-          headers: supabaseHeaders({'Prefer':'return=representation'}),
-          body: JSON.stringify({description: budgetDesc, amount: costNum, paid_by: 'Όλοι'})
-        }).then(function(r){ if(r.ok){ loadBudget(); } });
+        postBudgetEntry(budgetDesc, costNum, 'Όλοι');
       }
       document.getElementById('ferryFrom').value = '';
       document.getElementById('ferryTo').value = '';
@@ -2607,7 +2617,12 @@ loadWeather();
       render();
     });
     render();
-  });
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', initFerry);
+  } else {
+    initFerry();
+  }
 })();
 </script>
 </body>
