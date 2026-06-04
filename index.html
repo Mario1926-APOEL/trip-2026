@@ -2200,27 +2200,39 @@ function renderBudget(){
 }
 loadBudget();
 
-// Auto-seed fixed bookings into budget if not already present
+// Auto-seed fixed bookings into budget - only once ever
 async function seedFixedBudgetEntries(){
+  if(localStorage.getItem('kef_budget_seeded_v2')) return;
   var fixed = [
     {description: 'Πτήσεις LCA ↔ EFL (4 επιβ.)', amount: 992.06, paid_by: 'Όλοι'},
     {description: 'Yasemi Αργοστόλι · 17–21 Ιουλ', amount: 931.00, paid_by: 'Όλοι'},
     {description: "Ithaca's Poem Apartments · 21–24 Ιουλ", amount: 757.20, paid_by: 'Όλοι'},
     {description: 'Αυτοκίνητο Hertz · 17–24 Ιουλ', amount: 925.47, paid_by: 'Όλοι'},
   ];
-  var r = await fetch(SUPABASE_BUDGET_ENDPOINT+'?select=description&order=created_at.asc', {headers: supabaseHeaders()});
+  // Delete all existing and re-insert clean (removes duplicates)
+  var r = await fetch(SUPABASE_BUDGET_ENDPOINT+'?select=id,description', {headers: supabaseHeaders()});
   if(!r.ok) return;
   var existing = await r.json();
-  var existingDescs = existing.map(function(e){ return e.description; });
-  for(var i=0; i<fixed.length; i++){
-    if(existingDescs.indexOf(fixed[i].description) === -1){
-      await fetch(SUPABASE_BUDGET_ENDPOINT, {
-        method: 'POST',
-        headers: supabaseHeaders({'Prefer':'return=minimal'}),
-        body: JSON.stringify(fixed[i])
+  // Delete entries that look like seed entries (keywords match)
+  var seedKeywords = ['Yasemi','Ithaca','Hertz','LCA','EFL','Πτήσεις'];
+  for(var i=0; i<existing.length; i++){
+    var desc = existing[i].description || '';
+    var isSeed = seedKeywords.some(function(k){ return desc.indexOf(k) !== -1; });
+    if(isSeed){
+      await fetch(SUPABASE_BUDGET_ENDPOINT+'?id=eq.'+existing[i].id, {
+        method: 'DELETE', headers: supabaseHeaders()
       });
     }
   }
+  // Insert clean entries
+  for(var j=0; j<fixed.length; j++){
+    await fetch(SUPABASE_BUDGET_ENDPOINT, {
+      method: 'POST',
+      headers: supabaseHeaders({'Prefer':'return=minimal'}),
+      body: JSON.stringify(fixed[j])
+    });
+  }
+  localStorage.setItem('kef_budget_seeded_v2', '1');
   loadBudget();
 }
 seedFixedBudgetEntries();
