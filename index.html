@@ -394,6 +394,32 @@ body.dark-mode .tab-btn.active{
   box-shadow:0 6px 16px rgba(79,143,232,.22);
 }
 
+
+/* Ferry & Boat trips manager */
+.ferry-add-card{background:rgba(255,255,255,.82);border:1.5px dashed rgba(42,95,165,.35);border-radius:18px;padding:14px;margin-bottom:10px;backdrop-filter:blur(12px);}
+.ferry-add-title{font-size:13px;font-weight:850;color:#2a5fa5;margin-bottom:10px;text-transform:uppercase;letter-spacing:.06em;}
+.ferry-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.ferry-input{border:1px solid rgba(0,0,0,.12);border-radius:10px;padding:8px 10px;font-size:13px;font-family:inherit;background:#f5f2ec;outline:none;width:100%;}
+.ferry-input:focus{border-color:#2a5fa5;background:#fff;}
+.ferry-save-btn{background:#2a5fa5;color:#fff;border:none;border-radius:10px;padding:8px 18px;font-size:13px;font-weight:700;cursor:pointer;margin-left:auto;}
+.ferry-card{background:rgba(255,255,255,.82);border:1px solid rgba(255,255,255,.66);border-radius:16px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 22px rgba(33,45,62,.08);backdrop-filter:blur(12px);}
+.ferry-icon{width:40px;height:40px;border-radius:50%;background:#e8f4fd;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.ferry-body{flex:1;min-width:0;}
+.ferry-name{font-size:15px;font-weight:700;color:#1a1a18;margin-bottom:2px;}
+.ferry-detail{font-size:12.5px;color:#7a7870;margin-bottom:5px;}
+.ferry-actions{display:flex;gap:6px;align-items:center;flex-shrink:0;flex-direction:column;}
+.ferry-toggle-btn{border:none;border-radius:10px;padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;}
+.ferry-toggle-btn.pending{background:#fff3e0;color:#e65100;}
+.ferry-toggle-btn.paid{background:#e1f5ee;color:#0f6e56;}
+.ferry-delete-btn{background:none;border:none;color:#ccc;font-size:16px;cursor:pointer;padding:2px;}
+.ferry-delete-btn:hover{color:#e53935;}
+body.dark-mode .ferry-add-card{background:rgba(27,32,38,.82);border-color:rgba(79,143,232,.3);}
+body.dark-mode .ferry-add-title{color:#7fb0ff;}
+body.dark-mode .ferry-input{background:#11161c;color:#f3f4f6;border-color:rgba(255,255,255,.14);}
+body.dark-mode .ferry-card{background:rgba(27,32,38,.82);border-color:rgba(255,255,255,.1);}
+body.dark-mode .ferry-name{color:#f3f4f6;}
+body.dark-mode .ferry-icon{background:rgba(79,143,232,.16);}
+@media(max-width:430px){.ferry-form-grid{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
@@ -449,15 +475,29 @@ body.dark-mode .tab-btn.active{
         <div class="dash-note" id="pendingPriorityNote">Με βάση τη σειρά στο Booking Priority.</div>
         <div class="dash-mini-list" id="pendingPriorityList"></div>
       </div>
-      <div class="dash-tile" id="accommodationTile">
-        <div class="dash-label">Accommodation</div>
-        <div class="dash-value" id="accommodationStatusValue">Pending payment</div>
-        <div class="dash-note" id="accommodationStatusNote">Εκκρεμεί πληρωμή για Yasemi + Ithaca's Poem Apartments · €1,688.20.</div>
+      <div class="dash-tile" id="accommodationTile" style="cursor:pointer;" onclick="document.querySelector('[data-tab=trip]').click()">
+        <div class="dash-label">&#127968; Accommodation</div>
+        <div class="dash-value" style="font-size:16px;" id="accommodationStatusValue">Yasemi + Ithaca's Poem</div>
+        <div class="dash-note" id="accommodationStatusNote">17&ndash;24 Ιουλ &bull; 7 νύχτες &bull; &euro;1,688.20</div>
+        <div style="margin-top:8px;"><span class="badge-pending" style="cursor:default;">&#9201; Εκκρεμεί πληρωμή</span></div>
       </div>
-      <div class="dash-tile">
-        <div class="dash-label">Flights</div>
-        <div class="dash-value">Booked</div>
-        <div class="dash-note">LCA → EFL και επιστροφή μέσω Αθήνας.</div>
+      <div class="dash-tile" style="cursor:pointer;" onclick="document.querySelector('[data-tab=trip]').click()">
+        <div class="dash-label">&#9992; Flights</div>
+        <div class="dash-value" style="font-size:16px;">LCA &harr; EFL</div>
+        <div class="dash-note">Aegean + Sky Express &bull; 4 επιβ. &bull; &euro;992.06</div>
+        <div style="margin-top:8px;"><span class="badge-ok">&#10003; Πληρωμένο &euro;992.06</span></div>
+      </div>
+      <div class="dash-tile" style="cursor:pointer;" onclick="document.querySelector('[data-tab=trip]').click()">
+        <div class="dash-label">&#128663; Αυτοκίνητο</div>
+        <div class="dash-value" style="font-size:16px;">Toyota Yaris Cross</div>
+        <div class="dash-note">Hertz &bull; 17&ndash;24 Ιουλ &bull; 7 ημέρες</div>
+        <div style="margin-top:8px;"><span class="badge-ok">&#10003; Πληρωμένο &euro;925.47</span></div>
+      </div>
+      <div class="dash-tile" style="cursor:pointer;" onclick="document.querySelector('[data-tab=trip]').click()">
+        <div class="dash-label">&#9972; Ferry / Boat Trips</div>
+        <div class="dash-value" style="font-size:16px;">2 διαδρομές</div>
+        <div class="dash-note">Levante Ferries &bull; Σάμη &harr; Βαθύ &bull; ~30 λεπτά</div>
+        <div style="margin-top:8px;"><span class="badge-pending" style="cursor:default;">&#9201; Εκκρεμεί κράτηση</span></div>
       </div>
     </div>
 
@@ -498,11 +538,25 @@ body.dark-mode .tab-btn.active{
   <p class="section-label">Διαμονές</p>
   <div class="card"><div class="card-icon icon-hotel">&#127968;</div><div class="card-body"><p class="card-name">Yasemi &mdash; Αργοστόλι</p><p class="card-detail">17&ndash;21 Ιουλ &bull; 4 νύχτες &bull; &euro;931</p><button class="badge-pending" id="badge-yasemi">&#9201; Εκκρεμεί πληρωμή</button></div></div>
   <div class="card"><div class="card-icon icon-hotel">&#127968;</div><div class="card-body"><p class="card-name">Ithaca's Poem Apartments</p><p class="card-detail">21&ndash;24 Ιουλ &bull; Βαθύ, Ιθάκη &bull; 3 νύχτες &bull; &euro;757.20</p><button class="badge-pending" id="badge-ithaca">&#9201; Εκκρεμεί πληρωμή</button></div></div>
-  <p class="section-label">Ferry &mdash; Κεφαλονιά &rarr; Ιθάκη</p>
-  <div class="card"><div class="card-icon icon-car" style="background:#e8f4fd;">&#9971;</div><div class="card-body"><p class="card-name">Σάμη &rarr; Βαθύ, Ιθάκη</p><p class="card-detail">21 Ιουλ &bull; Levante Ferries &bull; ~30 λεπτά</p><span class="badge-pending" style="cursor:default;">&#9201; Εκκρεμεί κράτηση</span></div></div>
-  <div class="card"><div class="card-icon icon-car" style="background:#e8f4fd;">&#9971;</div><div class="card-body"><p class="card-name">Βαθύ, Ιθάκη &rarr; Σάμη</p><p class="card-detail">24 Ιουλ &bull; Levante Ferries &bull; ~30 λεπτά</p><span class="badge-pending" style="cursor:default;">&#9201; Εκκρεμεί κράτηση</span></div></div>
+  <p class="section-label">Ferry &amp; Boat Trips</p>
+  <div id="ferryBoatList"></div>
+  <div class="ferry-add-card">
+    <div class="ferry-add-title">&#43; Νέο Ferry / Boat Trip</div>
+    <div class="ferry-form-grid">
+      <input class="ferry-input" id="ferryRoute" type="text" placeholder="Διαδρομή (π.χ. Σάμη → Βαθύ)" />
+      <input class="ferry-input" id="ferryDate" type="text" placeholder="Ημερομηνία (π.χ. 21 Ιουλ)" />
+      <input class="ferry-input" id="ferryCompany" type="text" placeholder="Εταιρεία (π.χ. Levante Ferries)" />
+      <input class="ferry-input" id="ferryCost" type="text" placeholder="Κόστος (π.χ. €45)" />
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap;">
+      <label style="font-size:13px;color:#7a7870;display:flex;align-items:center;gap:5px;">
+        <input type="checkbox" id="ferryPending" checked /> Εκκρεμεί κράτηση
+      </label>
+      <button class="ferry-save-btn" id="ferryAddBtn" type="button">+ Προσθήκη</button>
+    </div>
+  </div>
   <p class="section-label">Αυτοκίνητο</p>
-  <div class="card"><div class="card-icon icon-car">&#128663;</div><div class="card-body"><p class="card-name">Ενοικίαση αυτοκινήτου</p><p class="card-detail">17&ndash;24 Ιουλ &bull; Κεφαλονιά &amp; Ιθάκη</p><span class="badge-pending" style="cursor:default;">&#9201; Εκκρεμεί κράτηση</span></div></div>
+  <div class="card"><div class="card-icon icon-car">&#128663;</div><div class="card-body"><p class="card-name">Toyota Yaris Cross &mdash; Hertz</p><p class="card-detail">17 Ιουλ 23:00 &ndash; 24 Ιουλ 18:00 &bull; 7 ημέρες &bull; Αεροδρόμιο Κεφαλονιάς</p><p class="card-detail">Κράτηση: <strong>9LIC1A</strong> &bull; Ref: <strong>CZZF03062026-01</strong></p><p class="card-detail">Οδηγός: <strong>Marios Efthymiou</strong> &bull; Additional: <strong>Haris Nicolaides</strong></p><p class="card-detail">SUV Medium &bull; 5 θέσεις &bull; A/C &bull; SCDW + Super Cover + Ferry cover</p><span class="badge-ok">&#10003; Πληρωμένο &mdash; &euro;925.47</span></div><div class="card-price">&euro;925.47<small>Pre-pay online</small></div></div>
 </div>
 <div class="tab-pane" id="tab-notes">
   <div class="name-bar"><label>&#128100; Όνομά σου:</label><input class="name-input" id="nameInput" type="text" placeholder="π.χ. Μαρία" maxlength="20"/><button class="name-save-btn" id="nameSaveBtn">OK</button></div>
@@ -2359,5 +2413,130 @@ loadWeather();
 })();
 </script>
 
+
+<script>
+(function(){
+  var STORE_KEY = 'kef_ferry_boats';
+
+  function load(){
+    try{ return JSON.parse(localStorage.getItem(STORE_KEY)) || []; }
+    catch(e){ return []; }
+  }
+  function save(items){ localStorage.setItem(STORE_KEY, JSON.stringify(items)); }
+
+  function render(){
+    var items = load();
+    var list = document.getElementById('ferryBoatList');
+    if(!list) return;
+    list.innerHTML = '';
+    if(!items.length){
+      list.innerHTML = '<div style="font-size:13px;color:#7a7870;text-align:center;padding:12px 0;">Δεν έχεις προσθέσει ακόμα ferry ή boat trip.</div>';
+      updateFerryDashTile(items);
+      return;
+    }
+    items.forEach(function(item, idx){
+      var card = document.createElement('div');
+      card.className = 'ferry-card';
+      var isPending = item.pending;
+      card.innerHTML =
+        '<div class="ferry-icon">&#9972;</div>' +
+        '<div class="ferry-body">' +
+          '<div class="ferry-name"></div>' +
+          '<div class="ferry-detail"></div>' +
+          (item.cost ? '<span class="' + (isPending ? 'badge-pending' : 'badge-ok') + '" style="cursor:default;">' + (isPending ? '&#9201; Εκκρεμεί · ' : '&#10003; Πληρωμένο · ') + '</span>' : '<span class="' + (isPending ? 'badge-pending' : 'badge-ok') + '" style="cursor:default;">' + (isPending ? '&#9201; Εκκρεμεί κράτηση' : '&#10003; Πληρωμένο') + '</span>') +
+        '</div>' +
+        '<div class="ferry-actions">' +
+          '<button class="ferry-toggle-btn ' + (isPending ? 'pending' : 'paid') + '" data-idx="' + idx + '">' + (isPending ? '⏱ Pending' : '✓ Πληρωμένο') + '</button>' +
+          '<button class="ferry-delete-btn" data-del="' + idx + '">&#128465;</button>' +
+        '</div>';
+      card.querySelector('.ferry-name').textContent = item.route;
+      var detail = [item.date, item.company].filter(Boolean).join(' · ');
+      card.querySelector('.ferry-detail').textContent = detail;
+      // fix cost badge
+      var badge = card.querySelector('.badge-pending, .badge-ok');
+      if(item.cost){
+        badge.textContent = (isPending ? '⏱ Εκκρεμεί · ' : '✓ Πληρωμένο · ') + item.cost;
+      }
+      list.appendChild(card);
+    });
+
+    // toggle paid/pending
+    list.addEventListener('click', function(e){
+      var btn = e.target.closest('.ferry-toggle-btn');
+      var del = e.target.closest('.ferry-delete-btn');
+      if(btn){
+        var i = parseInt(btn.getAttribute('data-idx'));
+        items[i].pending = !items[i].pending;
+        save(items);
+        render();
+      }
+      if(del){
+        var i = parseInt(del.getAttribute('data-del'));
+        items.splice(i,1);
+        save(items);
+        render();
+      }
+    }, {once: true});
+
+    updateFerryDashTile(items);
+  }
+
+  function updateFerryDashTile(items){
+    // update home dashboard ferry tile
+    var tiles = document.querySelectorAll('.dash-tile');
+    tiles.forEach(function(tile){
+      var label = tile.querySelector('.dash-label');
+      if(label && label.textContent.indexOf('Ferry') !== -1 && label.textContent.indexOf('Ιθάκη') !== -1){
+        var val = tile.querySelector('.dash-value');
+        var note = tile.querySelector('.dash-note');
+        var badge = tile.querySelector('.badge-pending, .badge-ok');
+        var total = items.length;
+        var pending = items.filter(function(i){ return i.pending; }).length;
+        var paid = total - pending;
+        if(val) val.textContent = total + ' ' + (total === 1 ? 'διαδρομή' : 'διαδρομές');
+        var companies = [...new Set(items.map(function(i){ return i.company; }).filter(Boolean))].join(', ');
+        if(note) note.textContent = companies || 'Levante Ferries · Σάμη ↔ Βαθύ';
+        if(badge){
+          if(pending > 0){
+            badge.className = 'badge-pending';
+            badge.style.cursor = 'default';
+            badge.textContent = '⏱ ' + pending + ' εκκρεμ' + (pending === 1 ? 'εί' : 'ούν') + ' κράτηση';
+          } else if(total > 0){
+            badge.className = 'badge-ok';
+            badge.style.cursor = 'default';
+            badge.textContent = '✓ Όλα πληρωμένα';
+          }
+        }
+      }
+    });
+  }
+
+  // Add button
+  document.addEventListener('DOMContentLoaded', function(){
+    var addBtn = document.getElementById('ferryAddBtn');
+    if(!addBtn) return;
+    addBtn.addEventListener('click', function(){
+      var route = document.getElementById('ferryRoute').value.trim();
+      if(!route) return;
+      var items = load();
+      items.push({
+        route: route,
+        date: document.getElementById('ferryDate').value.trim(),
+        company: document.getElementById('ferryCompany').value.trim(),
+        cost: document.getElementById('ferryCost').value.trim(),
+        pending: document.getElementById('ferryPending').checked
+      });
+      save(items);
+      document.getElementById('ferryRoute').value = '';
+      document.getElementById('ferryDate').value = '';
+      document.getElementById('ferryCompany').value = '';
+      document.getElementById('ferryCost').value = '';
+      document.getElementById('ferryPending').checked = true;
+      render();
+    });
+    render();
+  });
+})();
+</script>
 </body>
 </html>
