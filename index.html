@@ -2534,49 +2534,49 @@ loadWeather();
       list.appendChild(card);
     });
 
-    // toggle paid/pending
-    list.addEventListener('click', function(e){
-      var btn = e.target.closest('.ferry-toggle-btn');
-      var del = e.target.closest('.ferry-delete-btn');
-      if(btn){
-        var i = parseInt(btn.getAttribute('data-idx'));
-        var cur = items[i].state !== undefined ? items[i].state : (items[i].pending ? 0 : 2);
-        items[i].state = (cur + 1) % 3;
-        items[i].pending = items[i].state < 2;
-        save(items);
-        render();
-      }
-      if(del){
-        var i = parseInt(del.getAttribute('data-del'));
-        items.splice(i,1);
-        save(items);
-        render();
-      }
-      var editBtn = e.target.closest('.ferry-edit-cost-btn');
-      if(editBtn){
-        var i = parseInt(editBtn.getAttribute('data-edit'));
-        var editRow = document.getElementById('ferry-cost-edit-' + i);
-        if(editRow) editRow.style.display = editRow.style.display === 'none' ? 'flex' : 'none';
-      }
-      var saveBtn = e.target.closest('.ferry-save-cost-btn');
-      if(saveBtn){
-        var i = parseInt(saveBtn.getAttribute('data-save'));
-        var inp = document.getElementById('ferry-cost-val-' + i);
-        if(inp){
-          items[i].cost = inp.value.trim();
-          save(items);
-          // update budget if cost set
-          var costNum = parseFloat(items[i].cost.replace(/[^0-9.]/g,''));
-          if(!isNaN(costNum) && costNum > 0){
-            var budgetDesc = items[i].route + (items[i].date ? ' · ' + items[i].date : '');
-            postBudgetEntry(budgetDesc, costNum, 'Όλοι');
-          }
-          render();
-        }
-      }
-    }, {once: true});
-
     updateFerryDashTile(items);
+  }
+
+  function handleFerryClick(e){
+    var items = load();
+    var btn = e.target.closest('.ferry-toggle-btn');
+    var del = e.target.closest('.ferry-delete-btn');
+    var editBtn = e.target.closest('.ferry-edit-cost-btn');
+    var saveBtn = e.target.closest('.ferry-save-cost-btn');
+
+    if(btn){
+      var i = parseInt(btn.getAttribute('data-idx'));
+      var cur = items[i].state !== undefined ? items[i].state : (items[i].pending ? 0 : 2);
+      items[i].state = (cur + 1) % 3;
+      items[i].pending = items[i].state < 2;
+      save(items);
+      render();
+    }
+    if(del){
+      var i = parseInt(del.getAttribute('data-del'));
+      items.splice(i,1);
+      save(items);
+      render();
+    }
+    if(editBtn){
+      var i = parseInt(editBtn.getAttribute('data-edit'));
+      var editRow = document.getElementById('ferry-cost-edit-' + i);
+      if(editRow) editRow.style.display = editRow.style.display === 'none' ? 'flex' : 'none';
+    }
+    if(saveBtn){
+      var i = parseInt(saveBtn.getAttribute('data-save'));
+      var inp = document.getElementById('ferry-cost-val-' + i);
+      if(inp){
+        items[i].cost = inp.value.trim();
+        save(items);
+        var costNum = parseFloat(items[i].cost.replace(/[^0-9.]/g,''));
+        if(!isNaN(costNum) && costNum > 0){
+          var budgetDesc = items[i].route + (items[i].date ? ' · ' + items[i].date : '');
+          postBudgetEntry(budgetDesc, costNum, 'Όλοι');
+        }
+        render();
+      }
+    }
   }
 
   function updateFerryDashTile(items){
@@ -2619,6 +2619,9 @@ loadWeather();
   function initFerry(){
     var addBtn = document.getElementById('ferryAddBtn');
     if(!addBtn) return;
+    // Single persistent delegated listener on the list container
+    var list = document.getElementById('ferryBoatList');
+    if(list) list.addEventListener('click', handleFerryClick);
     addBtn.addEventListener('click', function(){
       var route = (document.getElementById('ferryFrom').value.trim() || document.getElementById('ferryTo').value.trim());
       if(!route) return;
