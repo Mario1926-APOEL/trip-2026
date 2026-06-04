@@ -1098,6 +1098,29 @@ async function confirmPayment(hotel) {
     // Mark as paid in budget seed (bump flag so seed re-runs and updates)
     localStorage.removeItem('kef_budget_seeded_v2');
     if(typeof seedFixedBudgetEntries === 'function') seedFixedBudgetEntries();
+
+// One-time cleanup of duplicate budget entries
+async function cleanDuplicateBudgetEntries(){
+  if(localStorage.getItem('kef_budget_deduped_v1')) return;
+  var r = await fetch(SUPABASE_BUDGET_ENDPOINT+'?select=id,description,created_at&order=created_at.asc', {headers: supabaseHeaders()});
+  if(!r.ok) return;
+  var all = await r.json();
+  var seen = {};
+  var toDelete = [];
+  // Keep last occurrence of each description, delete earlier ones
+  all.forEach(function(item){
+    if(seen[item.description]){
+      toDelete.push(seen[item.description]); // delete the older one
+    }
+    seen[item.description] = item.id;
+  });
+  for(var i=0; i<toDelete.length; i++){
+    await fetch(SUPABASE_BUDGET_ENDPOINT+'?id=eq.'+toDelete[i], {method:'DELETE', headers:supabaseHeaders()});
+  }
+  if(toDelete.length > 0) loadBudget();
+  localStorage.setItem('kef_budget_deduped_v1','1');
+}
+cleanDuplicateBudgetEntries();
   }
 }
 document.getElementById("badge-yasemi").addEventListener("click", function(){ confirmPayment("yasemi"); });
@@ -2258,6 +2281,29 @@ async function seedFixedBudgetEntries(){
 }
 seedFixedBudgetEntries();
 
+// One-time cleanup of duplicate budget entries
+async function cleanDuplicateBudgetEntries(){
+  if(localStorage.getItem('kef_budget_deduped_v1')) return;
+  var r = await fetch(SUPABASE_BUDGET_ENDPOINT+'?select=id,description,created_at&order=created_at.asc', {headers: supabaseHeaders()});
+  if(!r.ok) return;
+  var all = await r.json();
+  var seen = {};
+  var toDelete = [];
+  // Keep last occurrence of each description, delete earlier ones
+  all.forEach(function(item){
+    if(seen[item.description]){
+      toDelete.push(seen[item.description]); // delete the older one
+    }
+    seen[item.description] = item.id;
+  });
+  for(var i=0; i<toDelete.length; i++){
+    await fetch(SUPABASE_BUDGET_ENDPOINT+'?id=eq.'+toDelete[i], {method:'DELETE', headers:supabaseHeaders()});
+  }
+  if(toDelete.length > 0) loadBudget();
+  localStorage.setItem('kef_budget_deduped_v1','1');
+}
+cleanDuplicateBudgetEntries();
+
 // ============================================================
 // WEATHER
 // ============================================================
@@ -2554,6 +2600,13 @@ loadWeather();
     }
     if(del){
       var i = parseInt(del.getAttribute('data-del'));
+      var budgetId = items[i].budget_id;
+      if(budgetId){
+        fetch(SUPABASE_BUDGET_ENDPOINT + '?id=eq.' + budgetId, {
+          method: 'DELETE',
+          headers: supabaseHeaders()
+        }).then(function(){ loadBudget(); });
+      }
       items.splice(i,1);
       save(items);
       render();
@@ -2567,13 +2620,37 @@ loadWeather();
       var i = parseInt(saveBtn.getAttribute('data-save'));
       var inp = document.getElementById('ferry-cost-val-' + i);
       if(inp){
-        items[i].cost = inp.value.trim();
-        save(items);
-        var costNum = parseFloat(items[i].cost.replace(/[^0-9.]/g,''));
-        if(!isNaN(costNum) && costNum > 0){
-          var budgetDesc = items[i].route + (items[i].date ? ' · ' + items[i].date : '');
-          postBudgetEntry(budgetDesc, costNum, 'Όλοι');
+        var newCost = inp.value.trim();
+        var costNum = parseFloat(newCost.replace(/[^0-9.]/g,''));
+        var budgetDesc = items[i].route + (items[i].date ? ' · ' + items[i].date : '');
+        // If already has a budget_id → update, else insert
+        if(items[i].budget_id){
+          // update existing budget entry
+          fetch(SUPABASE_BUDGET_ENDPOINT + '?id=eq.' + items[i].budget_id, {
+            method: 'PATCH',
+            headers: supabaseHeaders({'Prefer':'return=minimal'}),
+            body: JSON.stringify({amount: isNaN(costNum) ? 0 : costNum, description: budgetDesc})
+          }).then(function(){ loadBudget(); });
+        } else if(!isNaN(costNum) && costNum > 0){
+          // insert new and store budget_id
+          fetch(SUPABASE_BUDGET_ENDPOINT, {
+            method: 'POST',
+            headers: supabaseHeaders({'Prefer':'return=representation'}),
+            body: JSON.stringify({description: budgetDesc, amount: costNum, paid_by: 'Όλοι'})
+          }).then(function(r){ return r.json(); }).then(function(rows){
+            if(rows && rows[0] && rows[0].id){
+              var its = load();
+              its[i].budget_id = rows[0].id;
+              its[i].cost = newCost;
+              save(its);
+              loadBudget();
+              render();
+            }
+          });
+          return; // async, skip sync render below
         }
+        items[i].cost = newCost;
+        save(items);
         render();
       }
     }
@@ -2645,12 +2722,22 @@ loadWeather();
         state: 0
       });
       save(items);
-      // Auto-add to budget as shared expense
+      // Auto-add to budget as shared expense and store budget_id
       var costNum = parseFloat(costVal.replace(/[^0-9.]/g,''));
+      var newIdx = items.length - 1;
       if(!isNaN(costNum) && costNum > 0){
-        var budgetDesc = routeStr;
-        if(dateStr) budgetDesc += ' · ' + dateStr;
-        postBudgetEntry(budgetDesc, costNum, 'Όλοι');
+        var budgetDesc = routeStr + (dateStr ? ' · ' + dateStr : '');
+        fetch(SUPABASE_BUDGET_ENDPOINT, {
+          method: 'POST',
+          headers: supabaseHeaders({'Prefer':'return=representation'}),
+          body: JSON.stringify({description: budgetDesc, amount: costNum, paid_by: 'Όλοι'})
+        }).then(function(r){ return r.json(); }).then(function(rows){
+          if(rows && rows[0] && rows[0].id){
+            var its = load();
+            if(its[newIdx]) { its[newIdx].budget_id = rows[0].id; save(its); }
+            loadBudget();
+          }
+        });
       }
       document.getElementById('ferryFrom').value = '';
       document.getElementById('ferryTo').value = '';
