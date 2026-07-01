@@ -485,7 +485,7 @@ body.dark-mode .ferry-icon{background:rgba(79,143,232,.16);}
         <div class="dash-label">&#127968; Accommodation</div>
         <div class="dash-value" style="font-size:16px;" id="accommodationStatusValue">Yasemi + Ithaca's Poem</div>
         <div class="dash-note" id="accommodationStatusNote">17&ndash;24 Ιουλ &bull; 7 νύχτες &bull; &euro;1,688.20</div>
-        <div style="margin-top:8px;"><span class="badge-pending" style="cursor:default;">&#9201; Εκκρεμεί πληρωμή</span></div>
+        <div style="margin-top:8px;" id="accommodationBadgeWrap"><span class="badge-pending" style="cursor:default;" id="accommodationBadge">&#9201; Εκκρεμεί πληρωμή</span></div>
       </div>
       <div class="dash-tile" style="cursor:pointer;" onclick="document.querySelector('[data-tab=trip]').click()">
         <div class="dash-label">&#9992; Flights</div>
@@ -1062,17 +1062,21 @@ function applyHotelStatus() {
 function updateAccommodationTile(){
   var valueEl=document.getElementById("accommodationStatusValue");
   var noteEl=document.getElementById("accommodationStatusNote");
+  var badgeEl=document.getElementById("accommodationBadge");
   if(!valueEl||!noteEl) return;
   var paidCount=(hotelStatus.yasemi?1:0)+(hotelStatus.ithaca?1:0);
   if(paidCount===2){
     valueEl.textContent="Booked";
     noteEl.textContent="Yasemi + Ithaca's Poem Apartments confirmed · €1,688.20.";
+    if(badgeEl){ badgeEl.className="badge-ok"; badgeEl.style.cursor="default"; badgeEl.innerHTML="&#10003; Πληρωμένο &euro;1,688.20"; }
   }else if(paidCount===1){
     valueEl.textContent="Partly booked";
     noteEl.textContent="1 από 2 διαμονές επιβεβαιώθηκε. Εκκρεμεί ακόμα μία πληρωμή.";
+    if(badgeEl){ badgeEl.className="badge-pending"; badgeEl.style.cursor="default"; badgeEl.innerHTML="&#9201; Εκκρεμεί 1 πληρωμή"; }
   }else{
     valueEl.textContent="Pending payment";
     noteEl.textContent="Εκκρεμεί πληρωμή για Yasemi + Ithaca's Poem Apartments · €1,688.20.";
+    if(badgeEl){ badgeEl.className="badge-pending"; badgeEl.style.cursor="default"; badgeEl.innerHTML="&#9201; Εκκρεμεί πληρωμή"; }
   }
 }
 async function loadHotelStatusShared(){
