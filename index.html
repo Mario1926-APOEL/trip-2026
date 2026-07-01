@@ -2665,7 +2665,7 @@ loadWeather();
     var tiles = document.querySelectorAll('.dash-tile');
     tiles.forEach(function(tile){
       var label = tile.querySelector('.dash-label');
-      if(label && label.textContent.indexOf('Ferry') !== -1 && label.textContent.indexOf('Ιθάκη') !== -1){
+      if(label && label.textContent.indexOf('Ferry') !== -1){
         var val = tile.querySelector('.dash-value');
         var note = tile.querySelector('.dash-note');
         var badge = tile.querySelector('.badge-pending, .badge-ok');
